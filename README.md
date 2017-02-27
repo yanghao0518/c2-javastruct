@@ -1,49 +1,46 @@
-# c2-javastruct
+使用说明：
+
+
 此组件目的为了解决C++与java通信过程中结构体在java解析困难。
 使得顺序读取结构体、顺序往结构体写入数据、修改结构协议代码的变得可配置、容易。
+<br/>
 读取C结构体为json例子：
-@HandleMessage(Type=HandleType.RECEIVE)
-public class HandleConfirmMessage implements HandleMessageService {
-
-	@Override
-	@HandleMessageProtocol(id="1")
-	public void handle(JSONObject message) {
-		System.out.println("ACK->" + message);
-	}
+```java 
+@HandleMessage(Type=HandleType.RECEIVE) public class HandleConfirmMessage implements HandleMessageService {
+@Override 
+@HandleMessageProtocol(id="1")
+public void handle(JSONObject message) {
+    System.out.println("ACK->" + message);
 }
-
+}   
+```
 写入json到C结构体例子：
-public void send(){
-		SendMessageService sendService = new SendMessageServiceImpl();
-		JSONObject message = new JSONObject();
-		message.put("Gateway_Id", 1234);
-		message.put("Package_Number", 25);
-		message.put("command_properties", 0x01);
-		message.put("BCC", 0x01);
-		sendService.send("1", message);
-	}
+```java
+ SendMessageService sendService = new SendMessageServiceImpl();
+ JSONObject message = new JSONObject(); 
+ message.put("Gateway_Id", 1234);  
+ message.put("Package_Number", 25);
+ message.put("command_properties", 0x01);
+ message.put("BCC", 0x01);
+ sendService.send("1", message); 
+ ```
 
-接收数据协议的xml配置：
+接收数据协议的FC.xml配置： 
+```java
+<!-- 实现解析类的基本路径 --> 
+<base_package src="com.sgck.dtu.analysis.read.handle"/>
 <!-- 以下每个协议都有包头和包尾在解析的时候，会自动加上 -->
 <!-- 包头，通过包头指定的 primaryKey解析每次通信所属协议,也称作每次通信的公共部分-->
-<head primaryKey="Package_Type">
+<head primaryKey="Package_Type"> 
 <Constant_Up type="ushort"/><!--  2字节，前导字符，固定为0XAAAA，表示为上行数据包-->
-<Gateway_Id type="unsigendint"/><!-- 4字节，网关id号 -->
+<Gateway_Id type="unsigendint"/><!-- 4字节，网关id号 --> 
 <Package_Type type="char"/><!-- 具体根据每个协议ID决定 -->
 </head>
-
-<!-- 包尾可以没有 -->
+<!-- 包尾可以没有 --> 
 <foot>
 <BCC type="char"/><!-- 1个字节，前面所有数据含前导，异或运算 -->
 <Constant_Up_Stop type="ushort"/><!-- 2字节，固定为0XAA55，表示为上行数据包结束 -->
 </foot>
-
-<!-- 包检测机制 -->
-<!-- 检测长度 -->
-<check type="length">
-<start isContain="true">Package_length</start>
-<end isContain="true">BBC</end>
-</check>
 
 <!-- 通讯确认 协议号=0x01-->
 <Gateway_Server name="ACK" id="1" check="length">
@@ -59,3 +56,4 @@ public void send(){
 =0X06，接收正确，命令无法执行。
  -->
 </Gateway_Server>
+ ```
