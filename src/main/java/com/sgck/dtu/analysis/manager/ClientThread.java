@@ -54,7 +54,7 @@ public class ClientThread extends Thread
 	{// 不断接收客户端的消息，进行处理。
 		while (!iscolse) {
 			try {
-				readMessageServer.read(this.socket.getInputStream());
+				readMessageServer.read(this.socket);
 			} catch (SocketException e) {
 				// 断开连接释放资源
 				System.out.println(getPrintInfo() + ",已经断开连接!");

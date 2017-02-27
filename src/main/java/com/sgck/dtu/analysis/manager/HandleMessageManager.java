@@ -8,6 +8,7 @@ import java.util.Map;
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.annotation.HandleMessage;
 import com.sgck.dtu.analysis.annotation.HandleMessageProtocol;
+import com.sgck.dtu.analysis.annotation.ResponseMessageProtocol;
 import com.sgck.dtu.analysis.annotation.HandleMessage.HandleType;
 import com.sgck.dtu.analysis.common.TemplateMessage;
 import com.sgck.dtu.analysis.read.HandleMessageService;
@@ -23,7 +24,7 @@ public class HandleMessageManager
 {
 
 	private Map<String, HandleMessageService> handleMessageServiceMapping;
-	
+	private Map<String,String> responseMapping;
 	private HandleMessageManager()
 	{
 		try {
@@ -39,6 +40,7 @@ public class HandleMessageManager
 	private void initHandleFcMessageService() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException
 	{
 		handleMessageServiceMapping = new HashMap<String, HandleMessageService>();
+		responseMapping = new HashMap<String,String>();
 		// 首先有模版管理类负责解析模版
 		// 获取FC模版实例
 		TemplateMessage FCMessageTemplate = TemplateMessageManager.getInstance().getFCMessageTemplate();
@@ -46,6 +48,8 @@ public class HandleMessageManager
 		if (FCMessageTemplate.getTemplates().isEmpty()) {
 			return;
 		}
+		
+		TemplateMessage TCMessageTemplate = TemplateMessageManager.getInstance().getTCMessageTemplate();
 
 		// 获取基础包路径集合
 		List<String> basePackages = FCMessageTemplate.getBasePackages();
@@ -80,6 +84,20 @@ public class HandleMessageManager
 						throw new IllegalArgumentException("repeated HandleMessageProtocol annotation id=" + protocolId);
 					}
 					handleMessageServiceMapping.put(protocolId, (HandleMessageService) invoke.newInstance());
+					//获取@ResponseMessageProtocol注解
+					ResponseMessageProtocol responseProtocol = method.getAnnotation(ResponseMessageProtocol.class);
+					if(null != responseProtocol){
+						//检查协议ID是否在xml定义中有
+						String responseprotocolId = responseProtocol.id();
+						if (TCMessageTemplate.getMessage(responseprotocolId) == null) {
+							throw new IllegalArgumentException(invoke.getSimpleName() + "'method:" + method.getName() + "'ResponseMessageProtocol annotation id=" + protocolId + " not defined in FC.xml or TC.xml");
+						}
+						if (responseMapping.containsKey(protocolId)) {
+							throw new IllegalArgumentException("repeated HandleMessageProtocol to  ResponseMessageProtocol annotation id=" + protocolId);
+						}
+						responseMapping.put(protocolId, responseprotocolId);
+						
+					}
 				}
 
 			}
@@ -89,6 +107,14 @@ public class HandleMessageManager
 	public HandleMessageService getHandleFcMessageService(String protocolId)
 	{
 		return handleMessageServiceMapping.get(protocolId);
+	}
+	
+	public boolean isNeedResponse(String protocolId){
+		return this.responseMapping.containsKey(protocolId);
+	}
+	
+	public String getResponseProtocolId(String protocolId){
+		return this.responseMapping.get(protocolId);
 	}
 
 	public static HandleMessageManager getInstance()

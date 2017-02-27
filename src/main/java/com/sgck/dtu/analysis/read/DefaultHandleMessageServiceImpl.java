@@ -1,6 +1,7 @@
 package com.sgck.dtu.analysis.read;
 
 import com.alibaba.fastjson.JSONObject;
+import com.sgck.dtu.analysis.common.ResponseResult;
 
 /**
  * 默认接收实现类的代理类
@@ -29,12 +30,13 @@ public class DefaultHandleMessageServiceImpl implements HandleMessageService
 	}
 
 	@Override
-	public void handle(JSONObject message)
+	public ResponseResult handle(JSONObject message)
 	{
 		System.out.println("DefaultHandleFcMessageServiceImpl->" + message);
 		if (null != this.target) {
-			this.target.handle(message);
+			return this.target.handle(message);
 		}
+		return null;
 	}
 
 }
