@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.Socket;
 
 import com.alibaba.fastjson.JSONObject;
+import com.sgck.dtu.analysis.common.ErrorResponseResult;
 import com.sgck.dtu.analysis.common.Message;
 import com.sgck.dtu.analysis.common.Message.Field;
 import com.sgck.dtu.analysis.common.ResponseResult;
@@ -37,7 +38,6 @@ public class ReadMessageServerImpl implements ReadMessageServer
 	@Override
 	public void read(Socket socket) throws IOException, DtuMessageException
 	{
-		// new CommonAnalysisServerImpl().analysisDtuMessage(is);
 		analysis(socket);
 	}
 
@@ -85,7 +85,7 @@ public class ReadMessageServerImpl implements ReadMessageServer
 		HandleMessageService handleService = HandleMessageManager.getInstance().getHandleFcMessageService(content.getId());
 		
 		//需要返回处理回复
-		if(HandleMessageManager.getInstance().isNeedResponse(content.getId())){
+		if(HandleMessageManager.getInstance().getResponseProtocolId(content.getId())){
 			ResponseResult result = null;
 			if (null == handleService) {
 				// 处理具体协议类未找到 默认处理类进行输出并打印日志
@@ -93,10 +93,15 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			} else {
 				result = handleService.handle(newjson);
 			}
+			//处理错误
+			if(result instanceof ErrorResponseResult){
+				//暂时做错误输出
+				System.out.println(result.getMessage());
+				return;
+			}
 			//result
-			byte[] responsedata = responseMessageService.resolve(
-					HandleMessageManager.getInstance().getResponseProtocolId(content.getId()),
-					(JSONObject)result.getData());
+			JSONObject json = (JSONObject)result.getData();
+			byte[] responsedata = responseMessageService.resolve(json.getString("id"),json);
 			socket.getOutputStream().write(responsedata);
 		}else{
 			if (null == handleService) {

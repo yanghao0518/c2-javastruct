@@ -41,7 +41,7 @@ public class ClientThread extends Thread
 	}
 
 	// 客户端线程的构造方法
-	public ClientThread(Socket socket,ReadMessageServer readMessageServer,ClientNotOnlineCall callback)
+	public ClientThread(Socket socket, ReadMessageServer readMessageServer, ClientNotOnlineCall callback)
 	{
 		this.socket = socket;
 		this.readMessageServer = readMessageServer;
@@ -91,11 +91,14 @@ public class ClientThread extends Thread
 	// 自动删除本线程
 	public void autoRemove()
 	{
-		try {
-			this.callback.call(this);
-		} catch (IOException e) {
-			e.printStackTrace();
+		synchronized (ClientSocketManager.getInstance()) {
+			try {
+				this.callback.call(this);
+				iscolse = true;
+			} catch (IOException e) {
+				e.printStackTrace();
+				iscolse = false;
+			}
 		}
-		iscolse = true;
 	}
 }

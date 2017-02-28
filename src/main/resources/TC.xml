@@ -27,4 +27,135 @@
 =0X06，接收正确，命令无法执行。
  -->
 </Server_Gateway>
+<!-- 传感器设置下发给网关 -->
+<Server_Gateway name="Sensor_Setup" id="6">
+<Package_Type type="char" default="6"/><!-- 1字节，协议号=0x06 -->
+<Package_length type="ushort" default="93"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
+<Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
+<command_properties type="char"/><!-- 1字节，保留 -->
+<Sensor_Id type="uint"/><!-- 4字节，传感器ID -->
+<HP_Filter type="char" default="2"/><!--=0	无高通滤波     =1	3HZ高通滤波    =2 10HZ高通滤波-->
+<X_Angle type="char" default="0"/><!-- 1字节,传感器X方向安装角度，单位度。默认0度 -->
+<Sample_Character_Time type="char" default="4"/><!-- 
+数据采集间隔，报警状态未变不上传，报警状态变化则上传（含波形） 默认30分钟
+=0	
+=1	1分钟
+=2	5分钟
+=3	10分钟
+=4	30分钟
+=5	1小时
+=6	2小时
+=7	6小时
+=8	12小时
+=9	1天
+=10	2天
+-->
+<Upload_Character_Time type="char" default="6"/> <!-- 
+ 特征值上传间隔，时间到时由Upload_Sensor_Type上传类型	默认2个小时
+=0	
+=1	1分钟
+=2	5分钟
+=3	10分钟
+=4	30分钟
+=5	1小时
+=6	2小时
+=7	6小时
+=8	12小时
+=9	1天
+=10	2天
+-->
+<Upload_Wave_Time type="char" default="9"/><!-- 
+波形上传间隔，时间到后再由Upload_Type决定上传数据类型 默认1天
+=0	不上传
+=1	1分钟
+=2	5分钟
+=3	10分钟
+=4	30分钟
+=5	1小时
+=6	2小时
+=7	6小时
+=8	12小时
+=9	1天
+=10	2天
+=11	6天
+-->
+<Wave_long type="char" default="1"/><!-- 
+1字节，波形长度 默认1024个点
+=0  512点  
+=1  1024点
+=2  2048点	
+=3	4096点
+=4	8192点
+-->  
+<Sample_Frequency type="ushort" default="200"/> <!-- 2字节，采样频率 sps 默认200 -->
+<Upload_Sensor_Type type="char" default="9"/><!-- 
+ //1字节，传感器是否工作 默认  1 0 0 1
+bit 0
+=0 	振动不启动，若bit=1０，则bit2、3、4无意义。
+=1  振动启动
+bit 1
+=0 	直流特征值不上传
+=1  直流特征值上传
+bit 2
+=0 	加速度特征值不上传
+=1  加速度特征值上传
+bit 3
+=0 	速度特征值不上传
+=1  速度特征值上传
+-->
+<Upload_Wave_Type type="ushort" default="36352"/> <!-- 
+2字节，上传波形类型。该字段有效必须首先Upload_Sensor_Type	对应有效。 默认1000111000000000				
+=0	=1
+Bit0	是否上传波形	全不传	由其他位决定
+Bit1	加速度x波形	N	Y
+Bit2	加速度y波形	N	Y
+Bit3	加速度z波形	N	Y
+Bit4	速度x波形	N	Y
+Bit5	速度y波形	N	Y
+Bit6	速度z波形	N	Y
+ -->  
+<Temperature_alarm_diff type="short" default="3500"/> <!--和环境温度差报警,*0.01得到实际值,温差默认35，环境温度默认0XFFFF，表示该值无效，不报警，环境温度由4.2.2协议下传。-->
+<Temperature_alarm_HH type="short" default="8000"/><!--温度高高报警值，*0.01得到实际值,默认80度--> 
+<Temperature_alarm_H type="short" default="6000"/><!--温度高报警值，*0.01得到实际值%暂不做,默认60度-->	
+<Temperature_alarm_Change type="short" default="500"/><!--温度变化量报警值，和上一次Change报警比较*0.01得到实际值,默认5度-->
+<Temperature_alarm_L type="short" default="0"/><!--温度低报警值，*0.01得到实际值，%暂不做,默认0度-->
+<Temperature_alarm_LL type="short" default="-2000"/><!--温度低低报警值，*0.01得到实际值%暂不做。默认-20度--> 
+
+<Acc_X_alarm_HH type="ushort" default="100"/><!--加速度x方向高高报警值，乘以该值/100得到真实值,默认1--> 
+<Acc_X_alarm_H type="ushort" default="80"/><!--加速度x方向高报警值，默认0.8 --> 
+<Acc_X_alarm_Change type="ushort" default="30"/><!-- 加速度x方向变化量报警值，和上一次Change报警比较%不做 默认0.3 -->
+<Acc_X_alarm_L type="ushort" default="0"/><!-- 加速度x方向低报警值，乘以该值/100得到真实值%暂不做 默认0 -->
+<Acc_X_alarm_LL type="ushort" default="0"/><!-- 加速度x方向低低报警值，%暂不做 /默认0 -->
+
+<Acc_Y_alarm_HH type="ushort" default="100"/><!-- 加速度y方向高高报警值，乘以该值/100得到真实值 默认1 -->
+<Acc_Y_alarm_H type="ushort" default="80"/><!-- 加速度y方向高报警值 默认0.8 -->
+<Acc_Y_alarm_Change type="ushort" default="30"/><!-- 加速度y方向变化量报警值，和上一次Change报警比较%不做 默认0.3 -->
+<Acc_Y_alarm_L type="ushort" default="0"/><!-- 加速度y方向低报警值，乘以该值/100得到真实值%暂不做 默认0 -->
+<Acc_Y_alarm_LL type="ushort" default="0"/><!-- 加速度y方向低低报警值，%暂不做	默认0 -->
+
+<Acc_Z_alarm_HH type="ushort" default="100"/><!-- 加速度z方向高高报警值，乘以该值/100得到真实值 默认1 -->
+<Acc_Z_alarm_H type="ushort" default="80"/><!-- 加速度z方向高报警值 默认0.8 -->
+<Acc_Z_alarm_Change type="ushort" default="30"/><!-- 加速度z方向变化量报警值，和上一次Change报警比较%不做 默认0.3 -->
+<Acc_Z_alarm_L type="ushort" default="0"/><!-- 加速度z方向低报警值，乘以该值/100得到真实值%暂不做 默认0 -->
+<Acc_Z_alarm_LL type="ushort" default="0"/><!-- 加速度z方向低低报警值，%暂不做  默认0 -->
+
+<Speed_X_alarm_HH type="ushort" default="710"/><!-- 速度x方向高高报警值，乘以该值/100得到真实值 /默认7.1 -->
+<Speed_X_alarm_H type="ushort" default="280"/><!-- 速度x方向高报警值 默认2.8 -->
+<Speed_X_alarm_Change type="ushort" default="50"/><!--速度x方向变化量报警值，和上一次Change报警比较%不做  /默认0.5-->
+<Speed_X_alarm_L type="ushort" default="0"/><!--速度x方向低报警值，乘以该值/100得到真实值%暂不做  /默认0-->
+<Speed_X_alarm_LL type="ushort" default="0"/><!--速度x方向低低报警值，%暂不做  /默认0-->
+
+<Speed_Y_alarm_HH type="ushort" default="710"/><!-- 速度y方向高高报警值，乘以该值/100得到真实值 /默认7.1 -->
+<Speed_Y_alarm_H type="ushort" default="280"/><!-- 速度y方向高报警值 默认2.8 -->
+<Speed_Y_alarm_Change type="ushort" default="50"/><!--速度y方向变化量报警值，和上一次Change报警比较%不做  /默认0.5-->
+<Speed_Y_alarm_L type="ushort" default="0"/><!--速度y方向低报警值，乘以该值/100得到真实值%暂不做  /默认0-->
+<Speed_Y_alarm_LL type="ushort" default="0"/><!--速度y方向低低报警值，%暂不做  /默认0-->
+
+<Speed_Z_alarm_HH type="ushort" default="710"/><!-- 速度z方向高高报警值，乘以该值/100得到真实值 /默认7.1 -->
+<Speed_Z_alarm_H type="ushort" default="280"/><!-- 速度z方向高报警值 默认2.8 -->
+<Speed_Z_alarm_Change type="ushort" default="50"/><!--速度z方向变化量报警值，和上一次Change报警比较%不做  /默认0.5-->
+<Speed_Z_alarm_L type="ushort" default="0"/><!--速度z方向低报警值，乘以该值/100得到真实值%暂不做  /默认0-->
+<Speed_Z_alarm_LL type="ushort" default="0"/><!--速度z方向低低报警值，%暂不做  /默认0-->
+
+</Server_Gateway>
 </Server_Gateways>

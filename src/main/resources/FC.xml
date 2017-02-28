@@ -24,8 +24,6 @@
 <end isContain="true">BBC</end>
 </check>
 
-<!-- 自定义检测规则 check BBC -->
-
 <!-- 通讯确认 协议号=0x01-->
 <Gateway_Server name="ACK" id="1" check="length">
 <Version type="char"/><!-- 1字节,网关软件版本 -->
@@ -43,5 +41,31 @@
 
 <!-- 心跳 协议号=0x05 -->
 <Gateway_Server name="HeartBeat" id="5">
+</Gateway_Server>
+<!-- 特征值  0x02-->
+<Gateway_Server name="Character" id="2">
+<Sensor_Id type="unsigendint"/><!-- 4字节，传感器ID -->
+<Version type="char"/><!-- 1字节,网关软件版本 -->
+<Package_length type="ushort"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
+<Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
+<command_properties type="char"/><!-- 1字节，=0x01,表示传感器霍尔触发上传数据=0x02，表示传感器定时上传数据-->
+<Recver_Riss type="char" /><!-- 接收到这包数据的场强 -->
+<Battery type="char"/><!-- 电池电量,百分数 -->
+<Temperature type="short" realValueRule="*0.01"/><!-- 2字节，温度值,真实值等于该值*0.01 -->
+<Character_Attribute type="char"/><!-- 1字节，数据类型，即后面一组数据的类型。1加速度 2速度 --> 
+<Data_coefficient type="ushort"/><!-- 系数, 计算方法见5.11中Data_ coefficient字段 -->
+
+<Data_x_Rms type="ushort"/><!-- 2字节，x方向RMS值 -->
+<Data_x_PP type="ushort"/><!-- 2字节，x方向峰峰值-->
+<Data_x_P type="ushort"/><!-- 2字节，x方向峰值-->
+
+<Data_y_Rms type="ushort"/><!-- 2字节，y方向RMS值 -->
+<Data_y_PP type="ushort"/><!-- 2字节，y方向峰峰值-->
+<Data_y_P type="ushort"/><!-- 2字节，y方向峰值-->
+
+<Data_z_Rms type="ushort"/><!-- 2字节，z方向RMS值 -->
+<Data_z_PP type="ushort"/><!-- 2字节，z方向峰峰值-->
+<Data_z_P type="ushort"/><!-- 2字节，z方向峰值-->
+
 </Gateway_Server>
 </Gateway_Servers>

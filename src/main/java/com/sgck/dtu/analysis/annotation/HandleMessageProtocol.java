@@ -10,5 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface HandleMessageProtocol {
-    String id();
+    //协议号
+	String id();
+    //是否回应信息
+    boolean response() default false;
 }

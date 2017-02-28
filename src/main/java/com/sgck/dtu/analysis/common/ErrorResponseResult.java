@@ -15,20 +15,17 @@ public class ErrorResponseResult implements ResponseResult {
 
 	@Override
 	public int getCode() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.code;
 	}
 
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message;
 	}
 
 	@Override
 	public Object getData() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.data;
 	}
 
 }

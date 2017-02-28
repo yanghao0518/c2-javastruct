@@ -71,14 +71,14 @@ public class ClientSocketManager
 		}
 	}
 
-	public void addClient(Socket socket)
+	public synchronized void addClient(Socket socket)
 	{
 		ClientThread client = new ClientThread(socket, this.readMessageServer, this.callback);
 		client.start();// 开启对此客户端服务的线程
 		clients.add(client);
 	}
 
-	public void closeAllClients() throws IOException
+	public synchronized void closeAllClients() throws IOException
 	{
 		for (int i = clients.size() - 1; i >= 0; i--) {
 			// 给所有在线用户发送关闭命令

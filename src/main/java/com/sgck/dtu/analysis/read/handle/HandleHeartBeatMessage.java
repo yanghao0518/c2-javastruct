@@ -9,15 +9,15 @@ import com.sgck.dtu.analysis.common.ResponseResult;
 import com.sgck.dtu.analysis.read.HandleMessageService;
 
 /**
- * 处理消息确认
+ * 处理心跳包
  * @author DELL
  *
  */
 @HandleMessage(Type=HandleType.RECEIVE)
-public class HandleConfirmMessage implements HandleMessageService {
+public class HandleHeartBeatMessage implements HandleMessageService {
 
 	@Override
-	@HandleMessageProtocol(id="1",response=true)
+	@HandleMessageProtocol(id="5",response=true)
 	public ResponseResult handle(JSONObject message) {
 		System.out.println("ACK->" + message);
 		return null;

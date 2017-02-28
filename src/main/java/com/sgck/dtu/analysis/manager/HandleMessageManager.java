@@ -24,7 +24,7 @@ public class HandleMessageManager
 {
 
 	private Map<String, HandleMessageService> handleMessageServiceMapping;
-	private Map<String,String> responseMapping;
+	private Map<String,Boolean> responseMapping;
 	private HandleMessageManager()
 	{
 		try {
@@ -40,7 +40,7 @@ public class HandleMessageManager
 	private void initHandleFcMessageService() throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException
 	{
 		handleMessageServiceMapping = new HashMap<String, HandleMessageService>();
-		responseMapping = new HashMap<String,String>();
+		responseMapping = new HashMap<String,Boolean>();
 		// 首先有模版管理类负责解析模版
 		// 获取FC模版实例
 		TemplateMessage FCMessageTemplate = TemplateMessageManager.getInstance().getFCMessageTemplate();
@@ -84,20 +84,13 @@ public class HandleMessageManager
 						throw new IllegalArgumentException("repeated HandleMessageProtocol annotation id=" + protocolId);
 					}
 					handleMessageServiceMapping.put(protocolId, (HandleMessageService) invoke.newInstance());
-					//获取@ResponseMessageProtocol注解
-					ResponseMessageProtocol responseProtocol = method.getAnnotation(ResponseMessageProtocol.class);
-					if(null != responseProtocol){
-						//检查协议ID是否在xml定义中有
-						String responseprotocolId = responseProtocol.id();
-						if (TCMessageTemplate.getMessage(responseprotocolId) == null) {
-							throw new IllegalArgumentException(invoke.getSimpleName() + "'method:" + method.getName() + "'ResponseMessageProtocol annotation id=" + protocolId + " not defined in FC.xml or TC.xml");
-						}
-						if (responseMapping.containsKey(protocolId)) {
-							throw new IllegalArgumentException("repeated HandleMessageProtocol to  ResponseMessageProtocol annotation id=" + protocolId);
-						}
-						responseMapping.put(protocolId, responseprotocolId);
-						
+					// 得到response值
+					boolean response = protocol.response();
+					if (responseMapping.containsKey(protocolId)) {
+						throw new IllegalArgumentException("repeated HandleMessageProtocol to  response set and annotation id=" + protocolId);
 					}
+					responseMapping.put(protocolId, response);
+					
 				}
 
 			}
@@ -113,7 +106,7 @@ public class HandleMessageManager
 		return this.responseMapping.containsKey(protocolId);
 	}
 	
-	public String getResponseProtocolId(String protocolId){
+	public boolean getResponseProtocolId(String protocolId){
 		return this.responseMapping.get(protocolId);
 	}
 
