@@ -3,7 +3,8 @@ package com.sgck.dtu.analysis.read;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.sgck.dtu.analysis.common.Message.Field;
+import com.sgck.dtu.analysis.common.Field;
+
 
 /**
  * 针对于结构体具体每一项的解析服务

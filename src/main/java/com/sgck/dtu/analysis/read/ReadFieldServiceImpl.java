@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.sgck.dtu.analysis.common.BaseDataType;
-import com.sgck.dtu.analysis.common.Message.Field;
+import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.manager.TemplateMessageManager;
 import com.sgck.dtu.analysis.utiils.CommonUtils;
 

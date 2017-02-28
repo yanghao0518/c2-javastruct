@@ -11,8 +11,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.sgck.dtu.analysis.common.BaseDataType;
+import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
-import com.sgck.dtu.analysis.common.Message.Field;
 import com.sgck.dtu.analysis.common.TemplateMessage;
 
 /**
@@ -177,23 +177,29 @@ public class XmlUtils
 		if (null == nodejName || "".equals(nodejName.trim())) {
 			nodejName = nodej.getName();
 		}
-		//Field Field = new Field();
+		Field field = new Field(nodejName,dataType);
 		// 处理默认值
 		String defaultValue = nodej.attributeValue("default");
 		// 如果有默认值
 		if (null != defaultValue && !"".equals(defaultValue.trim())) {
 			Object def = DataTypeUtils.getBaseDateValue(dataType, defaultValue);
 			if (def != null) {
-				message.addField(index++, nodejName, dataType, def);
-				return;
+				field.setDefaultValue(def);
 			}
+			
 		}
-		message.addField(index++, nodejName, dataType);
 		
 		String realValueRule = nodej.attributeValue("realValueRule");
 		if(null != realValueRule){
-			
+			field.setRealValueRule(realValueRule);
 		}
+		
+		String variableLength = nodej.attributeValue("variableLength");
+		if(null != variableLength){
+			field.setVariableLength(Integer.parseInt(variableLength));
+		}
+		
+		message.addField(index ++, field);
 	}
 
 

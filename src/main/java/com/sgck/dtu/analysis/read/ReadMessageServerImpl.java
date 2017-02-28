@@ -6,8 +6,8 @@ import java.net.Socket;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.ErrorResponseResult;
+import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
-import com.sgck.dtu.analysis.common.Message.Field;
 import com.sgck.dtu.analysis.common.ResponseResult;
 import com.sgck.dtu.analysis.exception.DtuMessageException;
 import com.sgck.dtu.analysis.manager.HandleMessageManager;

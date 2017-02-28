@@ -8,7 +8,7 @@ public class Message
 	private String primaryKey;// 主键KEY，主要用于解析包头的协议类型
 	private int protocolIndex;// 获取解析协议所在下标
 	private Field[] fields;// 字段集合
-	private int bufferLength;//buffer数组总长度
+	private int bufferLength;// buffer数组总长度
 
 	public Message()
 	{
@@ -19,7 +19,7 @@ public class Message
 	{
 		fields = new Field[size];
 	}
-	
+
 	public int getBufferLength()
 	{
 		return bufferLength;
@@ -114,96 +114,20 @@ public class Message
 		this.fields[index] = new Field(name, type);
 		this.bufferLength += type.BYTES;
 	}
-	
+
 	public void addField(int index, String name, BaseDataType type, Object defaultValue)
 	{
 		this.getFields()[index] = new Field(name, type, defaultValue);
 		this.bufferLength += type.BYTES;
 	}
-	
+
 	public void addField(int index, Field field)
 	{
 		this.getFields()[index] = field;
-		this.bufferLength += field.getType().BYTES;
-	}
-
-
-	// 协议具体的某个字段信息
-	public class Field
-	{
-		private String name;// 字段名称
-		private BaseDataType type;// 数据类型 需要包括该数据项具体占有多少个字节数
-		private Object defaultValue;
-		private String realValueRule;//计算实际值规则
-		private int variableLength;//可变长度 
-		
-		
-		public int getVariableLength()
-		{
-			return variableLength;
-		}
-
-		public void setVariableLength(int variableLength)
-		{
-			this.variableLength = variableLength;
-		}
-
-		public Object getDefaultValue()
-		{
-			return defaultValue;
-		}
-
-		public void setDefaultValue(Object defaultValue)
-		{
-			this.defaultValue = defaultValue;
-		}
-
-		public Field(String name, BaseDataType type)
-		{
-			this.name = name;
-			this.type = type;
-		}
-
-		public Field()
-		{
-		}
-
-		public Field(String name, BaseDataType type, Object defaultValue)
-		{
-			this.name = name;
-			this.type = type;
-			this.defaultValue = defaultValue;
-		}
-		
-
-		public String getRealValueRule()
-		{
-			return realValueRule;
-		}
-
-		public void setRealValueRule(String realValueRule)
-		{
-			this.realValueRule = realValueRule;
-		}
-
-		public String getName()
-		{
-			return name;
-		}
-
-		public void setName(String name)
-		{
-			this.name = name;
-		}
-
-		public BaseDataType getType()
-		{
-			return type;
-		}
-
-		public void setType(BaseDataType type)
-		{
-			this.type = type;
+		if (field.getDefaultValue() == BaseDataType.STRING) {
+			this.bufferLength += field.getType().BYTES;
+		} else {
+			this.bufferLength += field.getVariableLength();
 		}
 
 	}

@@ -2,8 +2,8 @@ package com.sgck.dtu.analysis.writer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.BaseDataType;
+import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
-import com.sgck.dtu.analysis.common.Message.Field;
 import com.sgck.dtu.analysis.utiils.CheckUtils;
 import com.sgck.dtu.analysis.utiils.CommonUtils;
 
