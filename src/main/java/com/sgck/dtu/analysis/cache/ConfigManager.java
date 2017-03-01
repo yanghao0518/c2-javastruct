@@ -1,5 +1,6 @@
 package com.sgck.dtu.analysis.cache;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,9 +74,19 @@ public class ConfigManager
 		}
 
 	}
-
+	
+	
 	// 接收网关上传的组网信息
 	public void dealAcceptZwSensorInfoByWg(String gatewayId, String sensorid, int riss)
+	{
+		//先不处理，只做页面显示
+		DataCache.getInstance().refreshUploadZwInfo(sensorid, gatewayId, riss);
+
+	}
+	
+
+	// 接收网关上传的组网信息
+	public void dealAcceptZwSensorInfoByWgBak(String gatewayId, String sensorid, int riss)
 	{
 		// 判断记录信息是否存在
 		if (SensorTableCache.getInstance().isContain(sensorid)) {
@@ -120,7 +131,7 @@ public class ConfigManager
 		}
 
 		// 判断组网列表是否存在,如果存在更新配置
-		PrZwSensorTableCache.getInstance().setConfig(sensorid, config);
+		//PrZwSensorTableCache.getInstance().setConfig(sensorid, config);
 
 		// 判断待下发列表是否存在
 		if (PrDownSensorTableCache.getInstance().isContain(sensorid)) {
@@ -131,14 +142,30 @@ public class ConfigManager
 		}
 
 		// 当前下发列表是否存在
-		if (currentDownSensor.containsKey(sensorid)) {
-			SensorVo vo = currentDownSensor.get(sensorid);
-			synchronized (vo.getGateway_Id()) {
-				if (null != vo) {
-					vo.setConfig(config);
+		setCurrentDownSensorInfo(sensorid,config);
+	}
+	
+	private void setCurrentDownSensorInfo(String sensorid,JSONObject config){
+		// 当前下发列表是否存在
+				Iterator<Map.Entry<String, SensorVo>> entries = currentDownSensor.entrySet().iterator();
+				while (entries.hasNext()) {
+					SensorVo vo = entries.next().getValue();
+					if( null != vo && vo.getSensor_Id().equals(sensorid)){
+						vo.setConfig(config);
+					}
 				}
-			}
-		}
+	}
+	
+	private boolean isContainFromCurrentDown(String sensorid){
+		// 当前下发列表是否存在
+				Iterator<Map.Entry<String, SensorVo>> entries = currentDownSensor.entrySet().iterator();
+				while (entries.hasNext()) {
+					SensorVo vo = entries.next().getValue();
+					if( null != vo && vo.getSensor_Id().equals(sensorid)){
+						return true;
+					}
+				}
+				return false;
 	}
 
 	// 处理下发按钮
@@ -149,16 +176,12 @@ public class ConfigManager
 		if (PrDownSensorTableCache.getInstance().isContain(sensorid)) {
 			SensorVo vo = PrDownSensorTableCache.getInstance().selectById(sensorid);
 			vo.setConfig(config);
-			if (currentDownSensor.containsKey(sensorid)) {
-				SensorVo vo1 = currentDownSensor.get(sensorid);
-				synchronized (vo1.getGateway_Id()) {
-					vo1.setConfig(config);
-				}
-			}
+			// 当前下发列表是否存在
+			setCurrentDownSensorInfo(sensorid,config);
 			return;
 		}
 		// 判断组网列表是否存在,如果存在更新配置
-		PrZwSensorTableCache.getInstance().setConfig(sensorid, config);
+		//PrZwSensorTableCache.getInstance().setConfig(sensorid, config);
 	}
 	
 	// 批量提交上来的网关和传感器ID的关联关系
@@ -167,16 +190,17 @@ public class ConfigManager
 			for (String sensorid : Sensorids) {
 				
 				// 其次判断待组网缓存，如果存在则直接删除原待组网缓存，直接扔到待下发
-				if (PrZwSensorTableCache.getInstance().isContain(gatewayId, sensorid)) {
+				//组网先不考虑
+				/*if (PrZwSensorTableCache.getInstance().isContain(gatewayId, sensorid)) {
 					SensorVo vo = PrZwSensorTableCache.getInstance().selectById(gatewayId, sensorid);
 					// 放入待下发列表里面
 					PrDownSensorTableCache.getInstance().addorupdate(vo);
 					// 从待组网列表移除
 					PrZwSensorTableCache.getInstance().remove(sensorid);
 
-				}else{
+				}else{*/
 					//如果在当前发送列表则不做处理
-					if(this.currentDownSensor.containsKey(sensorid)){
+					if(isContainFromCurrentDown(sensorid)){
 						continue;
 					}
 					//判断待下发列表是否存在
@@ -192,7 +216,7 @@ public class ConfigManager
 					PrDownSensorTableCache.getInstance().addorupdate(vo);
 				}
 
-			}
+			//}
 
 		}
 		

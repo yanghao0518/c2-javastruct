@@ -20,11 +20,26 @@ public class DataCache
 
 	// 按照传感器ID以及类型做为key显示特征值
 	private final int maxPreCharacterLength = 1000;
+	
 	private Map<String, List<Number>> sensorTypeCharacters;
 
+	//网关上传的组网信息，暂时只做显示
+	private SensorVo uploadZwInfo;
+	
 	private DataCache()
 	{
 		sensorTypeCharacters = new ConcurrentHashMap<String, List<Number>>();
+		uploadZwInfo = new SensorVo();
+	}
+	
+	public void refreshUploadZwInfo(String sensorId,String wid,int riss){
+		uploadZwInfo.setGateway_Id(wid);
+		uploadZwInfo.setSensor_Id(sensorId);
+		uploadZwInfo.setRiss(riss);
+	}
+	
+	public SensorVo getUploadZwInfo(){
+		return uploadZwInfo;
 	}
 
 	// 特征值显示类型

@@ -11,7 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 
 /**
  * 待组网的信息表
- * 
+ * @暂时不考虑组网实现
  * @author DELL
  *
  */
