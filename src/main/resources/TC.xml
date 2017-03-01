@@ -32,8 +32,8 @@
 <Package_Type type="char" default="6"/><!-- 1字节，协议号=0x06 -->
 <Package_length type="ushort" default="93"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
 <Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
-<command_properties type="char"/><!-- 1字节，保留 -->
-<Sensor_Id type="uint"/><!-- 4字节，传感器ID -->
+<command_properties type="char" default="0"/><!-- 1字节，保留 -->
+<Sensor_Id type="unsigendint"/><!-- 4字节，传感器ID -->
 <HP_Filter type="char" default="2"/><!--=0	无高通滤波     =1	3HZ高通滤波    =2 10HZ高通滤波-->
 <X_Angle type="char" default="0"/><!-- 1字节,传感器X方向安装角度，单位度。默认0度 -->
 <Sample_Character_Time type="char" default="4"/><!-- 
