@@ -1,13 +1,17 @@
 package com.sgck.tcp.sgck_dtu_server;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class Test
 {
 
 	public static void main(String[] args)
 	{
-		char a = '1';
-		int x1 = (int) 0.8;
-		int x = (int)a;
-		System.out.println(x1);
+		JSONObject json = new JSONObject();
+		int b = 100;
+		json.put("a", 1);
+		json.put("b", b);
+		
+		System.out.println(json.getIntValue("a")/json.getDoubleValue("b"));
 	}
 }

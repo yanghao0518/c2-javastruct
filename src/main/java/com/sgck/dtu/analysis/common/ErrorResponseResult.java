@@ -28,4 +28,10 @@ public class ErrorResponseResult implements ResponseResult {
 		return this.data;
 	}
 
+	@Override
+	public boolean isReptSend()
+	{
+		return false;
+	}
+
 }

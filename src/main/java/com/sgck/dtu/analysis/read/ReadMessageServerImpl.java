@@ -101,14 +101,24 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			}
 			//result
 			JSONObject json = (JSONObject)result.getData();
-			byte[] responsedata = responseMessageService.resolve(json.getString("id"),json);
+			byte[] responsedata = responseMessageService.resolve(json.getString("id"),json.getJSONObject("data"));
 			socket.getOutputStream().write(responsedata);
 		}else{
+			ResponseResult result = null;
+			
+			
 			if (null == handleService) {
 				// 处理具体协议类未找到 默认处理类进行输出并打印日志
-				defaultHandleMessage(newjson);
+				result = defaultHandleMessage(newjson);
 			} else {
-				handleService.handle(newjson);
+				result = handleService.handle(newjson);
+			}
+			
+			if(null != result && result.isReptSend()){
+				//重发
+				JSONObject json = (JSONObject)result.getData();
+				byte[] responsedata = responseMessageService.resolve(json.getString("id"),json.getJSONObject("data"));
+				socket.getOutputStream().write(responsedata);
 			}
 		}
 		

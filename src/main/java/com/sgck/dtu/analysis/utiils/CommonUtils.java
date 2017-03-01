@@ -3,19 +3,18 @@ package com.sgck.dtu.analysis.utiils;
 public class CommonUtils
 {
 
-	public static byte[] toLH(int n,int index)
+	public static byte[] toLH(int n, int index)
 	{
-		if(index == 4){
+		if (index == 4) {
 			return toLH(n);
-		}else if(index == 2){
+		} else if (index == 2) {
 			return toLH2(n);
-		}else if(index == 1){
+		} else if (index == 1) {
 			return toLH1(n);
 		}
 		return toLH(n);
-		
 	}
-	
+
 	public static byte[] toLH(int n)
 	{
 		byte[] b = new byte[4];
@@ -69,14 +68,12 @@ public class CommonUtils
 	// 将C/C++的无符号 DWORD类型转换为java的long型
 	public static long getLong(byte buf[], int index)
 	{
-
 		int firstByte = (0x000000FF & ((int) buf[index]));
 		int secondByte = (0x000000FF & ((int) buf[index + 1]));
 		int thirdByte = (0x000000FF & ((int) buf[index + 2]));
 		int fourthByte = (0x000000FF & ((int) buf[index + 3]));
 		long unsignedLong = ((long) (firstByte | secondByte << 8 | thirdByte << 16 | fourthByte << 24)) & 0xFFFFFFFFL;
 		return unsignedLong;
-
 	}
 
 }

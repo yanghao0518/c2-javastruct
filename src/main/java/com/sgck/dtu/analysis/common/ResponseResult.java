@@ -8,4 +8,6 @@ public interface ResponseResult {
 	
 	public Object getData();
 	
+	public boolean isReptSend();
+	
 }
