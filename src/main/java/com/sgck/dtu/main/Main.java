@@ -31,7 +31,7 @@ public class Main
 	}
 	
 	public static void init(){
-		TemplateMessageManager.getInstance();
+	    TemplateMessageManager.getInstance();
 		HandleMessageManager.getInstance();
 	}
 

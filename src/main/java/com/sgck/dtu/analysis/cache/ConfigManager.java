@@ -80,7 +80,7 @@ public class ConfigManager
 	public void dealAcceptZwSensorInfoByWg(String gatewayId, String sensorid, int riss)
 	{
 		//先不处理，只做页面显示
-		DataCache.getInstance().refreshUploadZwInfo(sensorid, gatewayId, riss);
+		//DataCache.getInstance().refreshUploadZwInfo(sensorid, gatewayId, riss);
 
 	}
 	

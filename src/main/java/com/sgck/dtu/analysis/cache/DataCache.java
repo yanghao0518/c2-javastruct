@@ -32,11 +32,18 @@ public class DataCache
 		uploadZwInfo = new SensorVo();
 	}
 	
-	public void refreshUploadZwInfo(String sensorId,String wid,int riss){
+	public void refreshUploadZwInfo(SensorVo vo){
+		this.uploadZwInfo = vo;
+	}
+	
+	public void refreshUploadZwInfo(String sensorId,String wid,int riss,JSONObject json){
 		uploadZwInfo.setGateway_Id(wid);
 		uploadZwInfo.setSensor_Id(sensorId);
 		uploadZwInfo.setRiss(riss);
+		uploadZwInfo.setConfig(json);
 	}
+	
+	
 	
 	public SensorVo getUploadZwInfo(){
 		return uploadZwInfo;

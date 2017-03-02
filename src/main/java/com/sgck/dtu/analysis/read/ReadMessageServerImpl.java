@@ -3,12 +3,15 @@ package com.sgck.dtu.analysis.read;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.ErrorResponseResult;
 import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
 import com.sgck.dtu.analysis.common.ResponseResult;
+import com.sgck.dtu.analysis.common.SystemConsts;
 import com.sgck.dtu.analysis.exception.DtuMessageException;
 import com.sgck.dtu.analysis.manager.HandleMessageManager;
 import com.sgck.dtu.analysis.manager.TemplateMessageManager;
@@ -23,7 +26,7 @@ public class ReadMessageServerImpl implements ReadMessageServer
 	private HandleMessageService defaultHandleFcMessageService = new DefaultHandleMessageServiceImpl();
 
 	private ResponseMessageService responseMessageService = new ResponseMessageServiceImpl();
-	
+
 	public void setAnalysisFieldService(ReadFieldService analysisFieldService)
 	{
 		this.analysisFieldService = analysisFieldService;
@@ -43,12 +46,20 @@ public class ReadMessageServerImpl implements ReadMessageServer
 
 	public void analysis(Socket socket) throws IOException, DtuMessageException
 	{
+
 		// 获取head模板
 		Message head = TemplateMessageManager.getInstance().getFCMessageTemplate().getHead();
 		Field[] fields = head.getFields();
 		int startIndex = 0;
 		int endIndex = fields.length;
 		JSONObject newjson = new JSONObject();
+
+		if (SystemConsts.isDebug) {
+			// 记录原始的byte[]集合,用于调试
+			List<Byte> lists = new ArrayList<Byte>();
+			newjson.put(SystemConsts.DATAPACKAGESIGN, lists);
+		}
+
 		InputStream is = socket.getInputStream();
 		// 接收前缀包
 		for (int i = startIndex; i < endIndex; i++) {
@@ -83,9 +94,9 @@ public class ReadMessageServerImpl implements ReadMessageServer
 
 		// 解析完成 需要根据不同的模板往不同的处理类下发
 		HandleMessageService handleService = HandleMessageManager.getInstance().getHandleFcMessageService(content.getId());
-		
-		//需要返回处理回复
-		if(HandleMessageManager.getInstance().getResponseProtocolId(content.getId())){
+
+		// 需要返回处理回复
+		if (HandleMessageManager.getInstance().getResponseProtocolId(content.getId())) {
 			ResponseResult result = null;
 			if (null == handleService) {
 				// 处理具体协议类未找到 默认处理类进行输出并打印日志
@@ -93,36 +104,33 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			} else {
 				result = handleService.handle(newjson);
 			}
-			//处理错误
-			if(result instanceof ErrorResponseResult){
-				//暂时做错误输出
+			// 处理错误
+			if (result instanceof ErrorResponseResult) {
+				// 暂时做错误输出
 				System.out.println(result.getMessage());
 				return;
 			}
-			//result
-			JSONObject json = (JSONObject)result.getData();
-			byte[] responsedata = responseMessageService.resolve(json.getString("id"),json.getJSONObject("data"));
+			// result
+			JSONObject json = (JSONObject) result.getData();
+			byte[] responsedata = responseMessageService.resolve(json.getString("id"), json.getJSONObject("data"));
 			socket.getOutputStream().write(responsedata);
-		}else{
+		} else {
 			ResponseResult result = null;
-			
-			
+
 			if (null == handleService) {
 				// 处理具体协议类未找到 默认处理类进行输出并打印日志
 				result = defaultHandleMessage(newjson);
 			} else {
 				result = handleService.handle(newjson);
 			}
-			
-			if(null != result && result.isReptSend()){
-				//重发
-				JSONObject json = (JSONObject)result.getData();
-				byte[] responsedata = responseMessageService.resolve(json.getString("id"),json.getJSONObject("data"));
+
+			if (null != result && result.isReptSend()) {
+				// 重发
+				JSONObject json = (JSONObject) result.getData();
+				byte[] responsedata = responseMessageService.resolve(json.getString("id"), json.getJSONObject("data"));
 				socket.getOutputStream().write(responsedata);
 			}
 		}
-		
-		
 
 	}
 
@@ -141,13 +149,31 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			// 表示已经下线
 			throw new DtuMessageException(DtuMessageException.CLIENT_NOT_ONLINE, "this client tcp is not online~");
 		}
+		if (SystemConsts.isDebug) {
+			List<Byte> originalpackage = (List<Byte>) newjson.get(SystemConsts.DATAPACKAGESIGN);
+			for (int i = 0; i < recvHead.length; i++) {
+				originalpackage.add(recvHead[i]);
+			}
+		}
+
 		newjson.put(field.getName(), analysisFieldService.read(recvHead, field));
+
 	}
 
 	// 此方法需要抽象出去，影响读取方式
 	private void read(InputStream is, Field field, JSONObject newjson) throws IOException
 	{
-		newjson.put(field.getName(), analysisFieldService.read(is, field));
+		if (SystemConsts.isDebug) {
+			readDebug(is, field, newjson);
+		} else {
+			newjson.put(field.getName(), analysisFieldService.read(is, field));
+		}
+	}
+
+	// 此方法需要抽象出去，影响读取方式
+	private void readDebug(InputStream is, Field field, JSONObject newjson) throws IOException
+	{
+		analysisFieldService.read(is, field, newjson);
 	}
 
 }
