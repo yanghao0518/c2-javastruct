@@ -10,6 +10,7 @@ import com.sgck.dtu.analysis.cache.LastOptVo;
 import com.sgck.dtu.analysis.cache.SensorVo;
 import com.sgck.dtu.analysis.common.ResponseResult;
 import com.sgck.dtu.analysis.common.SuccessResponseResult;
+import com.sgck.dtu.analysis.common.SystemConsts;
 import com.sgck.dtu.analysis.read.HandleMessageService;
 
 /**
@@ -46,16 +47,19 @@ public class HandleHeartBeatMessage implements HandleMessageService
 		JSONObject config = currentDownSensor.getConfig();
 
 		config.put("Package_Number", message.get("Package_Number"));
+
 		config.put("Gateway_Id", message.get("Gateway_Id"));
 		// 需要强转16进制
 		config.put("Sensor_Id", Integer.parseInt(currentDownSensor.getSensor_Id(), 16));
 
 		JSONObject data = new JSONObject();
 		data.put("id", "6");// 传感器设置下发给网关
-		data.put("data", currentDownSensor);
+		data.put("data", config);
 		ResponseResult result = new SuccessResponseResult(data);
 		LastOptVo vo = new LastOptVo((Integer) message.get("Gateway_Id"), message.getIntValue("Package_Number"), "6", config);
 		AckLastCache.getInstance().setLastOpt(Gateway_Id, vo);
+		AckLastCache.getInstance().setPackages(currentDownSensor.getSensor_Id(), config.getBytes(SystemConsts.DATAPACKAGESIGN));
+		ConfigManager.getInstance().setDownSensorStatus(Gateway_Id, ConfigManager.DOWN_ING);
 		return result;
 	}
 

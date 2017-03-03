@@ -113,6 +113,9 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			// result
 			JSONObject json = (JSONObject) result.getData();
 			byte[] responsedata = responseMessageService.resolve(json.getString("id"), json.getJSONObject("data"));
+			if (SystemConsts.isDebug) {
+				json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN, responsedata);
+			}
 			socket.getOutputStream().write(responsedata);
 		} else {
 			ResponseResult result = null;
@@ -128,6 +131,9 @@ public class ReadMessageServerImpl implements ReadMessageServer
 				// 重发
 				JSONObject json = (JSONObject) result.getData();
 				byte[] responsedata = responseMessageService.resolve(json.getString("id"), json.getJSONObject("data"));
+				if (SystemConsts.isDebug) {
+					json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN, responsedata);
+				}
 				socket.getOutputStream().write(responsedata);
 			}
 		}

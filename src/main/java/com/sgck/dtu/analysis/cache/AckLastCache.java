@@ -18,11 +18,27 @@ public class AckLastCache
 	private int lastConfigDownPackageNumber = 0;
 
 	private Map<String, LastOptVo> lastopts;
+	
+	private Map<String, byte[]> sendpackages;
 
 	private AckLastCache()
 	{
 		lastopts = new ConcurrentHashMap<String, LastOptVo>();
+		sendpackages = new ConcurrentHashMap<String,byte[]>();
 	}
+	
+	public void setPackages(String sid,byte[] data)
+	{
+		if (SystemConsts.isDebug) {
+			sendpackages.put(sid, data);
+		}
+	}
+	
+	public byte[] getPackages(String sid)
+	{
+		return sendpackages.get(sid);
+	}
+	
 
 	public void setLastOpt(String gatewayId, LastOptVo vo)
 	{
