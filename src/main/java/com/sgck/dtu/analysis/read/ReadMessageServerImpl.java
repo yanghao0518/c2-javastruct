@@ -9,6 +9,7 @@ import java.util.List;
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.ErrorResponseResult;
 import com.sgck.dtu.analysis.common.Field;
+import com.sgck.dtu.analysis.common.LEDataInputStream;
 import com.sgck.dtu.analysis.common.Message;
 import com.sgck.dtu.analysis.common.ResponseResult;
 import com.sgck.dtu.analysis.common.SystemConsts;
@@ -60,14 +61,15 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			newjson.put(SystemConsts.DATAPACKAGESIGN, lists);
 		}
 
-		InputStream is = socket.getInputStream();
+		//InputStream is = socket.getInputStream();
+		LEDataInputStream is = new LEDataInputStream(socket.getInputStream());
 		// 接收前缀包
 		for (int i = startIndex; i < endIndex; i++) {
-			if (i == startIndex) {
-				readFirst(is, fields[i], newjson);
-			} else {
+			//if (i == startIndex) {
+				//readFirst(is, fields[i], newjson);
+			//} else {
 				read(is, fields[i], newjson);
-			}
+			//}
 		}
 		// 判断是具体哪个协议
 		Integer packageType = newjson.getInteger(head.getPrimaryKey());
@@ -91,6 +93,8 @@ public class ReadMessageServerImpl implements ReadMessageServer
 				read(is, fields[i], newjson);
 			}
 		}
+		
+		//is.close();
 
 		// 解析完成 需要根据不同的模板往不同的处理类下发
 		HandleMessageService handleService = HandleMessageManager.getInstance().getHandleFcMessageService(content.getId());
@@ -167,12 +171,47 @@ public class ReadMessageServerImpl implements ReadMessageServer
 	}
 
 	// 此方法需要抽象出去，影响读取方式
-	private void read(InputStream is, Field field, JSONObject newjson) throws IOException
+	private void read(LEDataInputStream is, Field field, JSONObject newjson) throws IOException
 	{
+	
+		switch(field.getType()){
+		case BOOLEAN:
+			 newjson.put(field.getName(),is.readBoolean());
+			 break;
+		case BYTE:
+			newjson.put(field.getName(),is.readByte());
+			break;
+		case CHAR:
+			newjson.put(field.getName(),is.readCharC());
+			break;	
+		case SHORT:
+			newjson.put(field.getName(),is.readShort());
+			break;
+		case USHORT:
+			newjson.put(field.getName(),is.readUnsignedShort());
+			break;	
+		case INT:
+			newjson.put(field.getName(),is.readInt());
+			break;
+		case UINT:
+			newjson.put(field.getName(),is.readInt());
+			break;	
+		case FLOAT:
+			newjson.put(field.getName(),is.readFloat());
+			break;
+		case DOUBLE:
+			newjson.put(field.getName(),is.readDouble());
+			break;
+		case STRING:
+			newjson.put(field.getName(),is.readUTF());
+			break;	
+		default:
+			throw new DtuMessageException(DtuMessageException.UNKNOWN_EXCEPTION,"not undefined jtype:"+field.getType().JTYPE);
+			 
+		}
 		if (SystemConsts.isDebug) {
-			readDebug(is, field, newjson);
-		} else {
-			newjson.put(field.getName(), analysisFieldService.read(is, field));
+			List<Byte> originalpackage = (List<Byte>) newjson.get(SystemConsts.DATAPACKAGESIGN);
+		    is.readOrgList(originalpackage);
 		}
 	}
 
@@ -180,6 +219,15 @@ public class ReadMessageServerImpl implements ReadMessageServer
 	private void readDebug(InputStream is, Field field, JSONObject newjson) throws IOException
 	{
 		analysisFieldService.read(is, field, newjson);
+	}
+	
+	private void readBak(InputStream is, Field field, JSONObject newjson) throws IOException
+	{
+		if (SystemConsts.isDebug) {
+			readDebug(is, field, newjson);
+		} else {
+			newjson.put(field.getName(), analysisFieldService.read(is, field));
+		}
 	}
 
 }

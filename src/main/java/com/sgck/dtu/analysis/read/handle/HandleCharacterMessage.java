@@ -19,7 +19,7 @@ public class HandleCharacterMessage implements HandleMessageService
 {
 
 	@Override
-	@HandleMessageProtocol(id = "5", response = false)
+	@HandleMessageProtocol(id = "2", response = false)
 	public ResponseResult handle(JSONObject message)
 	{
 		System.out.println("接收特征值信息:" + message);
