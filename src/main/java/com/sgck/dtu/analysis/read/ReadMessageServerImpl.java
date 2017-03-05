@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.ErrorResponseResult;
@@ -19,8 +20,7 @@ import com.sgck.dtu.analysis.manager.TemplateMessageManager;
 import com.sgck.dtu.analysis.writer.ResponseMessageService;
 import com.sgck.dtu.analysis.writer.ResponseMessageServiceImpl;
 
-public class ReadMessageServerImpl implements ReadMessageServer
-{
+public class ReadMessageServerImpl implements ReadMessageServer {
 
 	private ReadFieldService analysisFieldService = new ReadFieldServiceImpl();
 
@@ -28,28 +28,29 @@ public class ReadMessageServerImpl implements ReadMessageServer
 
 	private ResponseMessageService responseMessageService = new ResponseMessageServiceImpl();
 
-	public void setAnalysisFieldService(ReadFieldService analysisFieldService)
-	{
+	public void setAnalysisFieldService(ReadFieldService analysisFieldService) {
 		this.analysisFieldService = analysisFieldService;
 	}
 
-	public void setDefaultHandleFcMessageService(HandleMessageService defaultHandleFcMessageService)
-	{
-		this.defaultHandleFcMessageService = new DefaultHandleMessageServiceImpl(defaultHandleFcMessageService);
+	public void setDefaultHandleFcMessageService(
+			HandleMessageService defaultHandleFcMessageService) {
+		this.defaultHandleFcMessageService = new DefaultHandleMessageServiceImpl(
+				defaultHandleFcMessageService);
 
 	}
 
 	@Override
-	public void read(Socket socket) throws IOException, DtuMessageException
-	{
+	public void read(Socket socket) throws IOException, DtuMessageException {
 		analysis(socket);
 	}
 
-	public void analysis(Socket socket) throws IOException, DtuMessageException
-	{
+	public void analysis(Socket socket) throws IOException, DtuMessageException {
 
 		// 获取head模板
-		Message head = TemplateMessageManager.getInstance().getFCMessageTemplate().getHead();
+		Message head = TemplateMessageManager.getInstance()
+				.getFCMessageTemplate().getHead();
+		Map<String, CheckField> checkmapping = TemplateMessageManager
+				.getInstance().getFCMessageTemplate().getCheckFields();
 		Field[] fields = head.getFields();
 		int startIndex = 0;
 		int endIndex = fields.length;
@@ -61,46 +62,76 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			newjson.put(SystemConsts.DATAPACKAGESIGN, lists);
 		}
 
-		//InputStream is = socket.getInputStream();
+		// InputStream is = socket.getInputStream();
 		LEDataInputStream is = new LEDataInputStream(socket.getInputStream());
 		// 接收前缀包
 		for (int i = startIndex; i < endIndex; i++) {
-			//if (i == startIndex) {
-				//readFirst(is, fields[i], newjson);
-			//} else {
-				read(is, fields[i], newjson);
-			//}
+			// if (i == startIndex) {
+			// readFirst(is, fields[i], newjson);
+			// } else {
+			read(is, fields[i], newjson);
+			// }
 		}
 		// 判断是具体哪个协议
 		Integer packageType = newjson.getInteger(head.getPrimaryKey());
-		Message content = TemplateMessageManager.getInstance().getFCMessage(packageType.toString());
+		Message content = TemplateMessageManager.getInstance().getFCMessage(
+				packageType.toString());
 		if (content == null) {
-			throw new IllegalArgumentException("协议号:" + packageType + "，未在接收端定义!");
+			throw new IllegalArgumentException("协议号:" + packageType
+					+ "，未在接收端定义!");
 		}
 		fields = content.getFields();
 		endIndex = fields.length;
-		// 逐个开始解析
-		for (int i = 0; i < endIndex; i++) {
-			read(is, fields[i], newjson);
-		}
-		// 解析foot
-		Message foot = TemplateMessageManager.getInstance().getFCMessageTemplate().getFoot();
-		if (null != foot) {
-			fields = foot.getFields();
-			endIndex = fields.length;
+
+		List<String> checkIds = content.getCheckIds();
+		if (null != checkIds && !checkIds.isEmpty()) {
+			// 逐个开始解析
+			for (String cid : checkIds) {
+				CheckField check = checkmapping.get(cid);
+				for (int i = 0; i < endIndex; i++) {
+					read(is, fields[i], newjson, check);
+				}
+			}
+		} else {
 			// 逐个开始解析
 			for (int i = 0; i < endIndex; i++) {
 				read(is, fields[i], newjson);
 			}
 		}
-		
-		//is.close();
+
+		// 解析foot
+		Message foot = TemplateMessageManager.getInstance()
+				.getFCMessageTemplate().getFoot();
+		if (null != foot) {
+			fields = foot.getFields();
+			endIndex = fields.length;
+
+			if (null != checkIds && !checkIds.isEmpty()) {
+				// 逐个开始解析
+				for (String cid : checkIds) {
+					CheckField check = checkmapping.get(cid);
+					for (int i = 0; i < endIndex; i++) {
+						read(is, fields[i], newjson, check);
+					}
+				}
+			} else {
+				// 逐个开始解析
+				for (int i = 0; i < endIndex; i++) {
+					read(is, fields[i], newjson);
+				}
+			}
+
+		}
+
+		// is.close();
 
 		// 解析完成 需要根据不同的模板往不同的处理类下发
-		HandleMessageService handleService = HandleMessageManager.getInstance().getHandleFcMessageService(content.getId());
+		HandleMessageService handleService = HandleMessageManager.getInstance()
+				.getHandleFcMessageService(content.getId());
 
 		// 需要返回处理回复
-		if (HandleMessageManager.getInstance().getResponseProtocolId(content.getId())) {
+		if (HandleMessageManager.getInstance().getResponseProtocolId(
+				content.getId())) {
 			ResponseResult result = null;
 			if (null == handleService) {
 				// 处理具体协议类未找到 默认处理类进行输出并打印日志
@@ -116,9 +147,11 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			}
 			// result
 			JSONObject json = (JSONObject) result.getData();
-			byte[] responsedata = responseMessageService.resolve(json.getString("id"), json.getJSONObject("data"));
+			byte[] responsedata = responseMessageService.resolve(
+					json.getString("id"), json.getJSONObject("data"));
 			if (SystemConsts.isDebug) {
-				json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN, responsedata);
+				json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN,
+						responsedata);
 			}
 			socket.getOutputStream().write(responsedata);
 		} else {
@@ -134,9 +167,11 @@ public class ReadMessageServerImpl implements ReadMessageServer
 			if (null != result && result.isReptSend()) {
 				// 重发
 				JSONObject json = (JSONObject) result.getData();
-				byte[] responsedata = responseMessageService.resolve(json.getString("id"), json.getJSONObject("data"));
+				byte[] responsedata = responseMessageService.resolve(
+						json.getString("id"), json.getJSONObject("data"));
 				if (SystemConsts.isDebug) {
-					json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN, responsedata);
+					json.getJSONObject("data").put(
+							SystemConsts.DATAPACKAGESIGN, responsedata);
 				}
 				socket.getOutputStream().write(responsedata);
 			}
@@ -145,22 +180,24 @@ public class ReadMessageServerImpl implements ReadMessageServer
 	}
 
 	// 默认处理类
-	private ResponseResult defaultHandleMessage(JSONObject json)
-	{
+	private ResponseResult defaultHandleMessage(JSONObject json) {
 		return defaultHandleFcMessageService.handle(json);
 	}
 
 	// 读第一个时判断read值是否为-1，如果为-1则表示客户下线需要做下线处理
-	private void readFirst(InputStream is, Field field, JSONObject newjson) throws IOException, DtuMessageException
-	{
+	private void readFirst(InputStream is, Field field, JSONObject newjson)
+			throws IOException, DtuMessageException {
 		byte[] recvHead = new byte[field.getType().BYTES];
 		int rlRead = is.read(recvHead, 0, field.getType().BYTES);
 		if (-1 == rlRead) {
 			// 表示已经下线
-			throw new DtuMessageException(DtuMessageException.CLIENT_NOT_ONLINE, "this client tcp is not online~");
+			throw new DtuMessageException(
+					DtuMessageException.CLIENT_NOT_ONLINE,
+					"this client tcp is not online~");
 		}
 		if (SystemConsts.isDebug) {
-			List<Byte> originalpackage = (List<Byte>) newjson.get(SystemConsts.DATAPACKAGESIGN);
+			List<Byte> originalpackage = (List<Byte>) newjson
+					.get(SystemConsts.DATAPACKAGESIGN);
 			for (int i = 0; i < recvHead.length; i++) {
 				originalpackage.add(recvHead[i]);
 			}
@@ -170,59 +207,85 @@ public class ReadMessageServerImpl implements ReadMessageServer
 
 	}
 
+	private void read(LEDataInputStream is, Field field, JSONObject newjson,
+			CheckField check) throws IOException {
+
+		read(is, field, newjson);
+		List<Byte> originalpackage = (List<Byte>) newjson
+				.get(SystemConsts.DATAPACKAGESIGN);
+		check.check(field, new CheckFail() {
+			@Override
+			public void doSomething() {
+				// 做跳转
+			}
+
+		}, new Object[] { originalpackage, newjson.get("BBC") });
+
+	}
+
 	// 此方法需要抽象出去，影响读取方式
-	private void read(LEDataInputStream is, Field field, JSONObject newjson) throws IOException
-	{
-	
-		switch(field.getType()){
+	private void read(LEDataInputStream is, Field field, JSONObject newjson)
+			throws IOException {
+
+		switch (field.getType()) {
 		case BOOLEAN:
-			 newjson.put(field.getName(),is.readBoolean());
-			 break;
+			newjson.put(field.getName(), is.readBoolean());
+			break;
 		case BYTE:
-			newjson.put(field.getName(),is.readByte());
+			newjson.put(field.getName(), is.readByte());
 			break;
 		case CHAR:
-			newjson.put(field.getName(),is.readCharC());
-			break;	
+			newjson.put(field.getName(), is.readCharC());
+			break;
 		case SHORT:
-			newjson.put(field.getName(),is.readShort());
+			newjson.put(field.getName(), is.readShort());
 			break;
 		case USHORT:
-			newjson.put(field.getName(),is.readUnsignedShort());
-			break;	
+			newjson.put(field.getName(), is.readUnsignedShort());
+			break;
 		case INT:
-			newjson.put(field.getName(),is.readInt());
+			newjson.put(field.getName(), is.readInt());
 			break;
 		case UINT:
-			newjson.put(field.getName(),is.readInt());
-			break;	
+			newjson.put(field.getName(), is.readInt());
+			break;
 		case FLOAT:
-			newjson.put(field.getName(),is.readFloat());
+			newjson.put(field.getName(), is.readFloat());
 			break;
 		case DOUBLE:
-			newjson.put(field.getName(),is.readDouble());
+			newjson.put(field.getName(), is.readDouble());
 			break;
 		case STRING:
-			newjson.put(field.getName(),is.readUTF());
-			break;	
+			newjson.put(field.getName(), is.readUTF());
+			break;
+		case USHORTARRAY:
+			List<Byte> originalpackage = (List<Byte>) newjson
+					.get(SystemConsts.DATAPACKAGESIGN);
+			int[] datas = new int[1024];
+			is.readUShortArray(datas, originalpackage);
+			newjson.put(field.getName(), datas);
+			return;
 		default:
-			throw new DtuMessageException(DtuMessageException.UNKNOWN_EXCEPTION,"not undefined jtype:"+field.getType().JTYPE);
-			 
+			throw new DtuMessageException(
+					DtuMessageException.UNKNOWN_EXCEPTION,
+					"not undefined jtype:" + field.getType().JTYPE);
+
 		}
 		if (SystemConsts.isDebug) {
-			List<Byte> originalpackage = (List<Byte>) newjson.get(SystemConsts.DATAPACKAGESIGN);
-		    is.readOrgList(originalpackage);
+			List<Byte> originalpackage = (List<Byte>) newjson
+					.get(SystemConsts.DATAPACKAGESIGN);
+			is.readOrgList(originalpackage);
 		}
 	}
 
 	// 此方法需要抽象出去，影响读取方式
-	private void readDebug(InputStream is, Field field, JSONObject newjson) throws IOException
-	{
+	private void readDebug(InputStream is, Field field, JSONObject newjson)
+			throws IOException {
 		analysisFieldService.read(is, field, newjson);
 	}
-	
-	private void readBak(InputStream is, Field field, JSONObject newjson) throws IOException
-	{
+
+	private void readBak(InputStream is, Field field, JSONObject newjson)
+			throws IOException {
 		if (SystemConsts.isDebug) {
 			readDebug(is, field, newjson);
 		} else {

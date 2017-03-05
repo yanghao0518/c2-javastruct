@@ -11,6 +11,7 @@ class LEDataOutputStream implements DataOutput
    {
 	protected DataOutputStream d;
 	byte w[];
+	int writerSize;
 
    public LEDataOutputStream(OutputStream out)
       {

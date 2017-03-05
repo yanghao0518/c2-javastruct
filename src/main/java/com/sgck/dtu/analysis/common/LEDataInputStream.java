@@ -73,7 +73,7 @@ public class LEDataInputStream implements DataInput
    {
 	   d.readFully(w, 0, 4);
 	   return
-		   (w[3])      << 24 |
+		  (w[3])      << 24 |
 	      (w[2]&0xff) << 16 |
 	      (w[1]&0xff) <<  8 |
 	      (w[0]&0xff);
@@ -206,6 +206,19 @@ public class LEDataInputStream implements DataInput
    {
       return d.readUTF();
    }
+   
+   public final String readUTF(int size,String encoding,List<Byte>orgList) throws IOException{
+	   byte[] rc = new byte[size];
+	   d.readFully(rc, 0, size);
+	   for(int i=0;i<size;i++){
+		   orgList.add(rc[i]);
+	   }
+	   if(encoding != null){
+		   return new String(rc,encoding);
+	   }else{
+		   return new String(rc);
+	   }
+   }
 
    public final static String readUTF(DataInput in) throws IOException
    {
@@ -216,4 +229,23 @@ public class LEDataInputStream implements DataInput
    public final  void close() throws IOException   {
       d.close();
    }
+   
+   public final void readShortArray(short[] datas,List<Byte>orgList) throws IOException{
+	   
+	   int size = datas.length;
+	   for(int i=0;i<size;i++){
+		   datas[i] = readShort();
+		   readOrgList(orgList);
+	   } 
+   }
+   
+ public final void readUShortArray(int[] datas,List<Byte>orgList) throws IOException{
+	   
+	   int size = datas.length;
+	   for(int i=0;i<size;i++){
+		   datas[i] = readUnsignedShort();
+		   readOrgList(orgList);
+	   } 
+   }
+   
    }

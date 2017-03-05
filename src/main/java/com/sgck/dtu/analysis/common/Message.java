@@ -1,5 +1,8 @@
 package com.sgck.dtu.analysis.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Message
 {
 
@@ -9,14 +12,17 @@ public class Message
 	private int protocolIndex;// 获取解析协议所在下标
 	private Field[] fields;// 字段集合
 	private int bufferLength;// buffer数组总长度
+	private List<String> checkIds;
 
 	public Message()
 	{
-
+		checkIds = new ArrayList<>();
+		
 	}
 
 	public Message(int size)
 	{
+		checkIds = new ArrayList<>();
 		fields = new Field[size];
 	}
 
@@ -28,6 +34,21 @@ public class Message
 	public void setBufferLength(int bufferLength)
 	{
 		this.bufferLength = bufferLength;
+	}
+
+	
+	
+	
+	public List<String> getCheckIds() {
+		return checkIds;
+	}
+
+	public void setCheckIds(List<String> checkIds) {
+		this.checkIds = checkIds;
+	}
+	
+	public void addCheckId(String cid) {
+		this.checkIds.add(cid);
 	}
 
 	public void addMessage(int index, Message node)

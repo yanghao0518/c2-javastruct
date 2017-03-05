@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.sgck.dtu.analysis.common.Message;
+import com.sgck.dtu.analysis.read.CheckField;
 
 public class TemplateMessage
 {
@@ -24,11 +25,28 @@ public class TemplateMessage
 	//默认字符串接收格式
 	private String encoding = null;
 	
+	//校验过滤 
+	private Map<String,CheckField> checkFields;
+	
 	public TemplateMessage()
 	{
+		checkFields = new HashMap<>();
 
 	}
 	
+
+	public Map<String, CheckField> getCheckFields() {
+		return checkFields;
+	}
+
+	public void setCheckFields(Map<String, CheckField> checkFields) {
+		this.checkFields = checkFields;
+	}
+	
+	public void addCheckFields(String id,CheckField check) {
+		checkFields.put(id, check);
+	}
+
 	public Message getMessage(String key){
 		return templates.get(key);
 	}

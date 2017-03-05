@@ -14,6 +14,8 @@ import com.sgck.dtu.analysis.common.BaseDataType;
 import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
 import com.sgck.dtu.analysis.common.TemplateMessage;
+import com.sgck.dtu.analysis.read.CheckBBC;
+import com.sgck.dtu.analysis.read.CheckField;
 
 /**
  * xml解析类 采用dom4j
@@ -79,7 +81,27 @@ public class XmlUtils
 			CheckUtils.checkNull(src, "the base_package src is not allow null or empty from FC.xml or TC.xml");
 			template.addBasePackage(src);
 		} else if (name.equals("check")) {
+			String id = node.attributeValue("id");
+			CheckUtils.checkNull(id, "the check id is not allow null or empty from FC.xml or TC.xml");
+			String type = node.attributeValue("type");
+			CheckUtils.checkNull(type, "the check type is not allow null or empty from FC.xml or TC.xml");
 			// 检查模块
+			if("field".equals(type) && node.elements() != null && node.elements().size() > 0){
+				
+				Element children = (Element) node.elements().get(0);
+				
+				if(children.getName().equals("BBC")){
+					CheckBBC checkField = new CheckBBC();
+					String fieldName = children.attributeValue("fieldName");
+					CheckUtils.checkNull(fieldName, "the check next node is not allow null or empty from FC.xml or TC.xml");
+					checkField.setFieldName(fieldName);
+					String method = children.attributeValue("method");
+					if(method != null){
+						checkField.setMethod(method);
+					}
+					template.addCheckFields(id, checkField);
+				}
+			}
 		} else {
 			String pname = node.getParent().getName();
 			String cname = node.getName();
@@ -125,6 +147,10 @@ public class XmlUtils
 			message = new Message(content.elements().size());
 		}
 		
+		String check = content.attributeValue("check");
+		if( null != check){
+			message.addCheckId(check);
+		}
 		message.setId(id);
 		message.setName(content.attributeValue("name"));
 		int index = 0;

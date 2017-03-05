@@ -30,6 +30,8 @@ public final class DtuMessageException extends RuntimeException implements Seria
 	public static final int NOTFOUND_PARSETYPE_ID = 8;
 	
 	public static final int CLIENT_NOT_ONLINE = 9;
+	
+	public static final int BBC_CHECK_EXCEPTION = 10;
 
 	private int code; // DtuMessageException不能有子类，异常类型用ErrorCode表示，以便保持兼容。
 
@@ -103,6 +105,10 @@ public final class DtuMessageException extends RuntimeException implements Seria
 	
 	public boolean isNotOnline(){
 		return code == CLIENT_NOT_ONLINE;
+	}
+	
+	public boolean isBBCCheck(){
+		return code == BBC_CHECK_EXCEPTION;
 	}
 
 	@Override
