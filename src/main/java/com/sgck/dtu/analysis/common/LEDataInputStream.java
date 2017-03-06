@@ -71,9 +71,10 @@ public class LEDataInputStream implements DataInput
      */
    public final int readInt() throws IOException
    {
+	   readSize =4;
 	   d.readFully(w, 0, 4);
 	   return
-		  (w[3])      << 24 |
+		  (w[3]&0xff) << 24 |
 	      (w[2]&0xff) << 16 |
 	      (w[1]&0xff) <<  8 |
 	      (w[0]&0xff);
@@ -81,9 +82,10 @@ public class LEDataInputStream implements DataInput
    
    public final int readUnsignedInt() throws IOException
    {
+	   readSize =4;
 	   d.readFully(w, 0, 4);
 	   return
-		  (w[3])      << 24 |
+		  (w[3]&0xff) << 24 |
 	      (w[2]&0xff) << 16 |
 	      (w[1]&0xff) <<  8 |
 	      (w[0]&0xff);
@@ -97,7 +99,7 @@ public class LEDataInputStream implements DataInput
 	  readSize = 8;
       d.readFully(w, 0, 8);
       return
-      (long)(w[7])      << 56 |  /* long cast needed or shift done modulo 32 */
+      (long)(w[7]&0xff)      << 56 |  /* long cast needed or shift done modulo 32 */
       (long)(w[6]&0xff) << 48 |
       (long)(w[5]&0xff) << 40 |
       (long)(w[4]&0xff) << 32 |
@@ -178,12 +180,14 @@ public class LEDataInputStream implements DataInput
       return (byte)w[0];
    }
    
-   public final byte readCharC() throws IOException
+   public final int readCharC() throws IOException
    {
-	   
 	   readSize = 1;
 	   d.readFully(w, 0, 1);
-       return (byte) (w[0]&0xff);
+	   if(w[0] < 0){
+		  return w[0] + 256; 
+	   }
+       return (w[0]&0xff);
    }
 
    // note: returns an int, even though says Byte.

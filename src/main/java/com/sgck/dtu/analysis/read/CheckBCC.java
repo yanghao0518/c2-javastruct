@@ -5,7 +5,7 @@ import java.util.List;
 import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.exception.DtuMessageException;
 
-public class CheckBBC implements CheckField {
+public class CheckBCC implements CheckField {
 	
 	private String fieldName;
 	
@@ -43,7 +43,11 @@ public class CheckBBC implements CheckField {
 						rt ^= orgList.get(i);
 					}
 				}
+				if(rt < 0 ){
+					rt = rt + 256;
+				}
 				int bbc = (int)params[1];
+				
 				if(rt != bbc){
 					//校验失败
 					if(null != checkFail){

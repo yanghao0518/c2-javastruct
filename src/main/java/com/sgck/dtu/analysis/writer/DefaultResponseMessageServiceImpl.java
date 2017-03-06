@@ -6,7 +6,7 @@ import com.sgck.dtu.analysis.common.TemplateMessage;
 import com.sgck.dtu.analysis.manager.TemplateMessageManager;
 import com.sgck.dtu.analysis.utiils.CheckUtils;
 
-public class ResponseMessageServiceImpl implements ResponseMessageService {
+public class DefaultResponseMessageServiceImpl implements ResponseMessageService {
 	private WriteMessageService writeMessageService = new WriteMessageServiceImpl();
 	
 	private CheckRuleService checkRuleService = new CheckRuleServiceImpl();
@@ -48,7 +48,6 @@ public class ResponseMessageServiceImpl implements ResponseMessageService {
 				// 写入foot
 				startIndex = writeMessageService.write(template.getFoot(), content, buffer, startIndex);
 				// 返回buffer给socket
-				System.out.println(buffer.toString());
 				return buffer;
 	}
 

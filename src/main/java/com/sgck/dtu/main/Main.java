@@ -18,7 +18,7 @@ public class Main
 			new ReceiveMessageServer().serverStart(9999);
 			SendMessageService sendService = new SendMessageServiceImpl();
 			JSONObject message = new JSONObject();
-			message.put("Gateway_Id", 1234);
+			message.put("Gateway_Id", 123);
 			message.put("Package_Number", 25);
 			message.put("command_properties", 0x01);
 			message.put("BCC", 0x01);

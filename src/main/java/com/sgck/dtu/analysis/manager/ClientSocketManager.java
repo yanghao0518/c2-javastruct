@@ -2,8 +2,8 @@ package com.sgck.dtu.analysis.manager;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import com.sgck.dtu.analysis.read.ReadMessageServer;
 import com.sgck.dtu.analysis.read.ReadMessageServerImpl;
@@ -27,7 +27,7 @@ public class ClientSocketManager
 	private ClientSocketManager()
 	{
 		this.readMessageServer = new ReadMessageServerImpl();
-		clients = new ArrayList<ClientThread>();
+		clients = new Vector<ClientThread>();
 	}
 
 	private ClientNotOnlineCall callback = new ClientNotOnlineCall()
@@ -36,15 +36,15 @@ public class ClientSocketManager
 		@Override
 		public void call(ClientThread client) throws IOException
 		{
-			for (int i = clients.size() - 1; i >= 0; i--) {
-				if (clients.get(i).getSocket().getInetAddress().getHostAddress().equals(client.getSocket().getInetAddress().getHostAddress()) && clients.get(i).getSocket().getPort() == client.getSocket().getPort()) {
-					clients.get(i).getSocket().close();
-					clients.get(i).setClose();
-					clients.get(i).stop();// 停止这条服务线程
-					clients.remove(i);// 删除此用户的服务线程
+				for (int i = clients.size() - 1; i >= 0; i--) {
+					if (clients.get(i).getSocket().getInetAddress().getHostAddress().equals(client.getSocket().getInetAddress().getHostAddress()) && clients.get(i).getSocket().getPort() == client.getSocket().getPort()) {
+						clients.get(i).getSocket().close();
+						clients.get(i).setClose();
+						clients.get(i).stop();// 停止这条服务线程
+						clients.remove(i);// 删除此用户的服务线程
 
+					}
 				}
-			}
 		}
 	};
 

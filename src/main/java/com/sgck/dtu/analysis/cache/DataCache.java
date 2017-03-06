@@ -122,7 +122,11 @@ public class DataCache
 			if (null != list && list.size() == maxPreCharacterLength) {
 				list = new ArrayList<Number>();
 			}
+			if(null == list){
+				list = new ArrayList<Number>();
+			}
 			sensorTypeCharacters.put(key, list);
+			
 		}
 	}
 

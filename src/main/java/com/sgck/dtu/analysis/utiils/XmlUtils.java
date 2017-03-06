@@ -14,7 +14,7 @@ import com.sgck.dtu.analysis.common.BaseDataType;
 import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
 import com.sgck.dtu.analysis.common.TemplateMessage;
-import com.sgck.dtu.analysis.read.CheckBBC;
+import com.sgck.dtu.analysis.read.CheckBCC;
 import com.sgck.dtu.analysis.read.CheckField;
 
 /**
@@ -90,9 +90,9 @@ public class XmlUtils
 				
 				Element children = (Element) node.elements().get(0);
 				
-				if(children.getName().equals("BBC")){
-					CheckBBC checkField = new CheckBBC();
-					String fieldName = children.attributeValue("fieldName");
+				if(children.getName().equals("BCC")){
+					CheckBCC checkField = new CheckBCC();
+					String fieldName = children.attributeValue("targetField");
 					CheckUtils.checkNull(fieldName, "the check next node is not allow null or empty from FC.xml or TC.xml");
 					checkField.setFieldName(fieldName);
 					String method = children.attributeValue("method");
@@ -152,6 +152,10 @@ public class XmlUtils
 			message.addCheckId(check);
 		}
 		message.setId(id);
+		String secondPrimaryKey = content.attributeValue("secondPrimaryKey");
+		if(null != secondPrimaryKey){
+			message.setPrimaryKey(secondPrimaryKey);
+		}
 		message.setName(content.attributeValue("name"));
 		int index = 0;
 		for (Iterator j = content.elementIterator(); j.hasNext();) {
@@ -199,6 +203,12 @@ public class XmlUtils
 			dataType = DataTypeUtils.getDataType(nodej.attributeValue("type"));
 		}
 		CheckUtils.checkNull(dataType, "not found defined data type  or parserType please check enum BaseDataType");
+		
+		String secondPrimaryKey = nodej.attributeValue("secondPrimaryKey");
+		if(null != secondPrimaryKey){
+			//二次主键
+			message.setPrimaryKey(secondPrimaryKey);
+		}
 		String nodejName = nodej.attributeValue("name");
 		if (null == nodejName || "".equals(nodejName.trim())) {
 			nodejName = nodej.getName();

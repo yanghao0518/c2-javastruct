@@ -139,16 +139,22 @@ public class Message
 	public void addField(int index, String name, BaseDataType type, Object defaultValue)
 	{
 		this.getFields()[index] = new Field(name, type, defaultValue);
-		this.bufferLength += type.BYTES;
+		if (type == BaseDataType.STRING) {
+			this.bufferLength += defaultValue.toString().length();
+		} else {
+			this.bufferLength += type.BYTES;
+			
+		}
 	}
 
 	public void addField(int index, Field field)
 	{
 		this.getFields()[index] = field;
 		if (field.getDefaultValue() == BaseDataType.STRING) {
-			this.bufferLength += field.getType().BYTES;
-		} else {
 			this.bufferLength += field.getVariableLength();
+		} else {
+			this.bufferLength += field.getType().BYTES;
+			
 		}
 
 	}

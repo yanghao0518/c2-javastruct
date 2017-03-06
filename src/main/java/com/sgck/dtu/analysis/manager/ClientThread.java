@@ -91,7 +91,6 @@ public class ClientThread extends Thread
 	// 自动删除本线程
 	public void autoRemove()
 	{
-		synchronized (ClientSocketManager.getInstance()) {
 			try {
 				this.callback.call(this);
 				iscolse = true;
@@ -99,6 +98,5 @@ public class ClientThread extends Thread
 				e.printStackTrace();
 				iscolse = false;
 			}
-		}
 	}
 }

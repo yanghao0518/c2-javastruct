@@ -112,17 +112,15 @@ public class ReceiveMessageServer
 		public void run()
 		{
 			while (!isClose) {
-				synchronized (ClientSocketManager.getInstance()) {
-					for (ClientThread client : ClientSocketManager.getInstance().getClients()) {
-						if (isServerClose(client.getSocket())) {
-							client.autoRemove();
-						}
+				for (ClientThread client : ClientSocketManager.getInstance().getClients()) {
+					if (isServerClose(client.getSocket())) {
+						client.autoRemove();
 					}
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+				}
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 
