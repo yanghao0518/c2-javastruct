@@ -17,14 +17,14 @@ import com.sgck.dtu.analysis.read.HandleMessageService;
  *
  */
 @HandleMessage(Type = HandleType.RECEIVE)
-public class HandleWaveNextMessage implements HandleMessageService
+public class HandleWaveEndMessage implements HandleMessageService
 {
 
 	@Override
-	@HandleMessageProtocol(id = "4-5", response = true)
+	@HandleMessageProtocol(id = "4-6", response = true)
 	public ResponseResult handle(JSONObject message)
 	{
-		System.out.println("上传一包波形:" + message);
+		System.out.println("最后一组上传一包波形:" + message);
 
 		try {
 			// 包序号
@@ -56,14 +56,9 @@ public class HandleWaveNextMessage implements HandleMessageService
 			w1.setCurrentPackageNumber(Package_Number);
 			WaveCache.getInstance().removeConfig(Package_Number - 1);
 			WaveCache.getInstance().setConfig(w1);
-
-			// 判断是否为最后一包数据
-//			byte command_properties = message.getByteValue("command_properties");
-//			if (command_properties == 6) {
-//				// 结束包
-//				WaveCache.getInstance().dealRealData(w1);
-//				WaveCache.getInstance().removeConfig(w1.getCurrentPackageNumber());
-//			}
+			// 结束包
+			WaveCache.getInstance().dealRealData(w1);
+			WaveCache.getInstance().removeConfig(w1.getCurrentPackageNumber());
 
 		} catch (Exception e) {
 			e.fillInStackTrace();

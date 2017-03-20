@@ -3,6 +3,7 @@ package com.sgck.dtu.main;
 import java.net.BindException;
 
 import com.alibaba.fastjson.JSONObject;
+import com.sgck.dtu.analysis.common.SystemConsts;
 import com.sgck.dtu.analysis.manager.HandleMessageManager;
 import com.sgck.dtu.analysis.manager.TemplateMessageManager;
 import com.sgck.dtu.analysis.utiils.CommonUtils;
@@ -13,6 +14,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
+		SystemConsts.isTest = true;
 		init();
 		try {
 			new ReceiveMessageServer().serverStart(9999);

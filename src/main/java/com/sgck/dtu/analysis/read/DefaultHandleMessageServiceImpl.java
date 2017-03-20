@@ -1,5 +1,7 @@
 package com.sgck.dtu.analysis.read;
 
+import org.apache.log4j.Logger;
+
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.ResponseResult;
 
@@ -13,6 +15,8 @@ public class DefaultHandleMessageServiceImpl implements HandleMessageService
 {
 
 	private HandleMessageService target;
+	
+	Logger LOG = Logger.getLogger(this.getClass());
 
 	public DefaultHandleMessageServiceImpl()
 	{
@@ -32,7 +36,7 @@ public class DefaultHandleMessageServiceImpl implements HandleMessageService
 	@Override
 	public ResponseResult handle(JSONObject message)
 	{
-		System.out.println("DefaultHandleFcMessageServiceImpl->" + message);
+		LOG.info("DefaultHandleFcMessageServiceImpl->" + message);
 		if (null != this.target) {
 			return this.target.handle(message);
 		}

@@ -1,10 +1,11 @@
 package com.sgck.dtu.analysis.cache;
 
 import com.alibaba.fastjson.JSONObject;
+import com.sgck.dtu.analysis.common.SystemConsts;
 
 public class LastOptVo
 {
-	private int gatewayId;
+	private long gatewayId;
 	private int packageNumber;
 	private String id;
 	private JSONObject data;
@@ -13,14 +14,14 @@ public class LastOptVo
 		
 	}
 	
-	public LastOptVo(int gatewayId,String id,JSONObject data){
+	public LastOptVo(long gatewayId,String id,JSONObject data){
 		this.gatewayId = gatewayId;
 		this.id = id;
 		this.data = data;
 	}
 	
 	
-	public LastOptVo(int gatewayId,int packageNumber,String id,JSONObject data){
+	public LastOptVo(long gatewayId,int packageNumber,String id,JSONObject data){
 		this.gatewayId = gatewayId;
 		this.packageNumber = packageNumber;
 		this.id = id;
@@ -39,7 +40,7 @@ public class LastOptVo
 		this.packageNumber = packageNumber;
 	}
 
-	public int getGatewayId()
+	public long getGatewayId()
 	{
 		return gatewayId;
 	}
@@ -61,6 +62,9 @@ public class LastOptVo
 
 	public JSONObject getData()
 	{
+		if (SystemConsts.isDebug && null != data) {
+			data.remove(SystemConsts.DATAPACKAGESIGN);
+		}
 		return data;
 	}
 

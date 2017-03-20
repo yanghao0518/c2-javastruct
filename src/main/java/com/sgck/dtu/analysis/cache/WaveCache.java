@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
+
 import com.sgck.dtu.analysis.utiils.HexUtils;
 
 /**
@@ -21,6 +23,8 @@ public class WaveCache
 	// 保存真正的数据
 	// 传感器ID -> 加速度/速度 +XYZ联合类型 - >真实数据
 	private Map<String, Map<String, List<Number>>> data;
+	
+	Logger LOG = Logger.getLogger(this.getClass());
 
 	private WaveCache()
 	{
@@ -119,10 +123,10 @@ public class WaveCache
 				if (old.getCurrentPackageNumber() + 1 == news.getCurrentPackageNumber()) {
 					return true;
 				} else {
-					System.out.println("检查波形连续传包出问题：包序号不连续！currentPackageNumber:" + news.getCurrentPackageNumber() + ",lastPackageNumber:" + old.getCurrentPackageNumber());
+					LOG.error("检查波形连续传包出问题：包序号不连续！currentPackageNumber:" + news.getCurrentPackageNumber() + ",lastPackageNumber:" + old.getCurrentPackageNumber());
 				}
 			} else {
-				System.out.println("检查波形连续传包出问题：网关ID与传感器ID有不一致！currentPackageNumber:" + news.getCurrentPackageNumber());
+				LOG.error("检查波形连续传包出问题：网关ID与传感器ID有不一致！currentPackageNumber:" + news.getCurrentPackageNumber());
 			}
 		}
 

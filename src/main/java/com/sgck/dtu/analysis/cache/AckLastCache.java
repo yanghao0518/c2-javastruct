@@ -1,5 +1,6 @@
 package com.sgck.dtu.analysis.cache;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,22 +20,29 @@ public class AckLastCache
 
 	private Map<String, LastOptVo> lastopts;
 	
-	private Map<String, byte[]> sendpackages;
+	private Map<String, List<Number>> sendpackages;
 
 	private AckLastCache()
 	{
 		lastopts = new ConcurrentHashMap<String, LastOptVo>();
-		sendpackages = new ConcurrentHashMap<String,byte[]>();
+		sendpackages = new ConcurrentHashMap<String,List<Number>>();
 	}
 	
-	public void setPackages(String sid,byte[] data)
+	public void setPackages(String sid,List<Number> data)
 	{
 		if (SystemConsts.isDebug) {
 			sendpackages.put(sid, data);
 		}
 	}
 	
-	public byte[] getPackages(String sid)
+	public void removePackages(String sid)
+	{
+		if (SystemConsts.isDebug) {
+			sendpackages.remove(sid);
+		}
+	}
+	
+	public List<Number> getPackages(String sid)
 	{
 		return sendpackages.get(sid);
 	}

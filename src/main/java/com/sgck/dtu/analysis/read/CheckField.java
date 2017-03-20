@@ -5,5 +5,5 @@ import com.sgck.dtu.analysis.exception.DtuMessageException;
 
 public interface CheckField {
 	
-	public void check(Field field,CheckFail checkFail,Object ... params) throws DtuMessageException;
+	public void check(Field field,CheckFail checkFail,Object ... params);
 }

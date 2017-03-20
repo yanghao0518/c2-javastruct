@@ -7,6 +7,10 @@ public final class HexUtils
 		return "0X"+ Integer.toHexString(i);
 	}
 	
+	public static String getHexStringL(Long i){
+		return "0X"+ Long.toHexString(i);
+	}
+	
 	public static Integer getIntFromHex(String str){
 		if(str.startsWith("0X") || str.startsWith("0x")){
 			str = str.substring(2);

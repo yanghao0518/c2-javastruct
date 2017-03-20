@@ -26,33 +26,37 @@ public class SendMessageServiceImpl implements SendMessageService
 	public void send(String protocolid, JSONObject content)
 	{
 		// 返回buffer给socket
-		//ClientSocketManager.getInstance().sendMessage(responseMessageService.resolve(protocolid, content));
+		try {
+			ClientSocketManager.getInstance().sendMessage(responseMessageService.resolve(protocolid, content));
+		} catch (DtuMessageException | IOException e) {
+			e.printStackTrace();
+		}
 
 	    //return;
-		List<ClientThread> clients = ClientSocketManager.getInstance().getClients();
-		for (ClientThread client : clients) {
-			LEDataOutputStream dos = null;
-			try {
-				dos =  new LEDataOutputStream(client.getSocket().getOutputStream());
-				sendMessageNewService.send(dos, protocolid, content);
-			} catch (DtuMessageException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally{
-				if(null != dos){
-					try {
-						dos.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-			}
-		}
+//		List<ClientThread> clients = ClientSocketManager.getInstance().getClients();
+//		for (ClientThread client : clients) {
+//			LEDataOutputStream dos = null;
+//			try {
+//				dos =  new LEDataOutputStream(client.getSocket().getOutputStream());
+//				sendMessageNewService.send(dos, protocolid, content);
+//			} catch (DtuMessageException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} finally{
+//				if(null != dos){
+//					try {
+//						dos.close();
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//			}
+//		}
 
 	}
 

@@ -55,7 +55,7 @@ public class CheckRuleServiceImpl implements CheckRuleService
 			bcc = bcc ^ content.getByteValue(field.getName());
 			break;
 		case CHAR:
-			bcc = bcc ^ content.getByteValue(field.getName());
+			bcc = bcc ^ content.getIntValue(field.getName());
 			break;
 		case SHORT:
 			bcc = dealShort(bcc, content.getShortValue(field.getName()));

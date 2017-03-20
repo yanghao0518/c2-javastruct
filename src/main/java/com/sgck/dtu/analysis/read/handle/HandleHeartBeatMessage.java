@@ -58,7 +58,7 @@ public class HandleHeartBeatMessage implements HandleMessageService
 		ResponseResult result = new SuccessResponseResult(data);
 		LastOptVo vo = new LastOptVo((Integer) message.get("Gateway_Id"), message.getIntValue("Package_Number"), "6", config);
 		AckLastCache.getInstance().setLastOpt(Gateway_Id, vo);
-		AckLastCache.getInstance().setPackages(currentDownSensor.getSensor_Id(), config.getBytes(SystemConsts.DATAPACKAGESIGN));
+		//AckLastCache.getInstance().setPackages(currentDownSensor.getSensor_Id(), config.getBytes(SystemConsts.DATAPACKAGESIGN));
 		ConfigManager.getInstance().setDownSensorStatus(Gateway_Id, ConfigManager.DOWN_ING);
 		return result;
 	}

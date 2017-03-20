@@ -2,10 +2,14 @@ package com.sgck.dtu.analysis.utiils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import com.sgck.dtu.analysis.read.HandleMessageService;
 
@@ -101,5 +105,28 @@ public class ClassUtils
 			}
 		}
 		return classes;
+	}
+
+	public static String[] findClassesImplementInterfaceFromJar(String interfaceName, String jarPath) throws ClassNotFoundException, IOException
+	{
+		URL url = new URL("jar:file:" + jarPath + "!/");
+		JarURLConnection jarConnection = (JarURLConnection) url.openConnection();
+		JarFile jarFile = jarConnection.getJarFile();
+		List fullNames = new ArrayList();
+		Class interfaceClass = Class.forName(interfaceName);
+		// 遍历
+		for (JarEntry e : Collections.list(jarFile.entries())) {
+			String n = e.getName();
+			if (n.endsWith(".class")) {
+				n = n.substring(0, n.length() - 6);
+				n = n.replace('/', '.');
+				Class currentClass = Class.forName(n);
+				if (interfaceClass.isAssignableFrom(currentClass) && false == n.equals(interfaceName)) {
+					fullNames.add(n);
+				}
+			}
+		}
+		// 返回结果
+		return (String[]) fullNames.toArray(new String[fullNames.size()]);
 	}
 }

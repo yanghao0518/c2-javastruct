@@ -13,6 +13,7 @@ import org.dom4j.io.SAXReader;
 import com.sgck.dtu.analysis.common.BaseDataType;
 import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.Message;
+import com.sgck.dtu.analysis.common.SystemConsts;
 import com.sgck.dtu.analysis.common.TemplateMessage;
 import com.sgck.dtu.analysis.read.CheckBCC;
 import com.sgck.dtu.analysis.read.CheckField;
@@ -28,13 +29,21 @@ public class XmlUtils
 
 	public static TemplateMessage parserFCXml() throws DocumentException, IllegalArgumentException, IOException
 	{
-		InputStream is = XmlUtils.class.getResourceAsStream("/FC.xml");
+		String xml = "/FC.xml";
+		if(SystemConsts.isTest){
+			xml = "/FC_T.xml";
+		}
+		InputStream is = XmlUtils.class.getResourceAsStream(xml);
 		return parserXml(is);
 	}
 
 	public static TemplateMessage parserTCXml() throws DocumentException, IllegalArgumentException, IOException
 	{
-		InputStream is = XmlUtils.class.getResourceAsStream("/TC.xml");
+		String xml = "/TC.xml";
+		if(SystemConsts.isTest){
+			xml = "/TC_T.xml";
+		}
+		InputStream is = XmlUtils.class.getResourceAsStream(xml);
 		return parserXml(is);
 	}
 

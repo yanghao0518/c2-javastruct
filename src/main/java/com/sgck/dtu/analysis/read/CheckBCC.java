@@ -52,9 +52,9 @@ public class CheckBCC implements CheckField {
 					//校验失败
 					if(null != checkFail){
 						checkFail.doSomething();
-					}else{
-						throw new DtuMessageException(DtuMessageException.BBC_CHECK_EXCEPTION,"bbc check fail");
 					}
+					throw new DtuMessageException(DtuMessageException.BBC_CHECK_EXCEPTION,"bbc check fail");
+					
 				}
 			}else{
 				//暂时未定义直接过滤

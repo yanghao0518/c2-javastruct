@@ -96,7 +96,10 @@ public class ConfigManager
 			if (!currentDownSensor.containsKey(gatewayId)) {
 				refresh(gatewayId);
 			}
-			return currentDownSensor.get(gatewayId).getSensorVo();
+			if(currentDownSensor.containsKey(gatewayId)){
+				return currentDownSensor.get(gatewayId).getSensorVo();
+			}
+			return null;
 		}
 
 	}

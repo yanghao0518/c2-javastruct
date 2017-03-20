@@ -34,8 +34,8 @@ public class ReceiveMessageServer
 			serverThread.start();
 			isStart = true;
 			// 开启检测线程
-			CheckSocketClientThread checkThread = new CheckSocketClientThread();
-			checkThread.start();
+			//CheckSocketClientThread checkThread = new CheckSocketClientThread();
+			//checkThread.start();
 		} catch (BindException e) {
 			isStart = false;
 			throw new BindException("端口号已被占用，请换一个！");
@@ -100,45 +100,6 @@ public class ReceiveMessageServer
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
-		}
-	}
-
-	// 实时检查客户端socket是否断掉
-	class CheckSocketClientThread extends Thread
-	{
-
-		@Override
-		public void run()
-		{
-			while (!isClose) {
-				for (ClientThread client : ClientSocketManager.getInstance().getClients()) {
-					if (isServerClose(client.getSocket())) {
-						client.autoRemove();
-					}
-				}
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-
-		/**
-		 * 判断是否断开连接，断开返回true,没有返回false
-		 * 
-		 * @param socket
-		 * @return
-		 */
-		private Boolean isServerClose(Socket socket)
-		{
-			try {
-				socket.sendUrgentData(0xFF);// 发送1个字节的紧急数据，默认情况下，服务器端没有开启紧急数据处理，不影响正常通信
-				return false;
-			} catch (Exception se) {
-				return true;
 			}
 		}
 	}

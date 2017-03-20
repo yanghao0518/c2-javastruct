@@ -2,10 +2,13 @@ package com.sgck.dtu.analysis.read;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.ErrorResponseResult;
@@ -19,7 +22,8 @@ import com.sgck.dtu.analysis.manager.TemplateMessageManager;
 import com.sgck.dtu.analysis.writer.ResponseMessageService;
 import com.sgck.dtu.analysis.writer.ResponseMessageServiceImpl;
 
-public class DefaultReadMessageServerImpl implements ReadMessageServer
+public class DefaultReadMessageServerImpl 
+//implements ReadMessageServer
 {
 
 	private ReadFieldService analysisFieldService = new ReadFieldServiceImpl();
@@ -38,14 +42,15 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 		this.defaultHandleFcMessageService = new DefaultHandleMessageServiceImpl(defaultHandleFcMessageService);
 
 	}
+	
+	Logger LOG = Logger.getLogger(this.getClass());
 
-	@Override
-	public void read(Socket socket) throws IOException, DtuMessageException
+	public void read(C2DataInput input,OutputStream os) throws IOException, DtuMessageException
 	{
-		analysis(socket);
+		analysis(input,os);
 	}
 
-	public void analysis(Socket socket) throws IOException, DtuMessageException
+	public void analysis(C2DataInput is,OutputStream os) throws IOException, DtuMessageException
 	{
 
 		// 获取head模板
@@ -62,7 +67,6 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 			newjson.put(SystemConsts.DATAPACKAGESIGN, lists);
 		}
 
-		InputStream is = socket.getInputStream();
 		// 接收前缀包
 		for (int i = startIndex; i < endIndex; i++) {
 			if (i == startIndex) {
@@ -136,7 +140,7 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 			// 处理错误
 			if (result instanceof ErrorResponseResult) {
 				// 暂时做错误输出
-				System.out.println(result.getMessage());
+				LOG.error(result.getMessage());
 				return;
 			}
 			// result
@@ -145,7 +149,7 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 			if (SystemConsts.isDebug) {
 				json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN, responsedata);
 			}
-			socket.getOutputStream().write(responsedata);
+			os.write(responsedata);
 		} else {
 			ResponseResult result = null;
 
@@ -163,7 +167,7 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 				if (SystemConsts.isDebug) {
 					json.getJSONObject("data").put(SystemConsts.DATAPACKAGESIGN, responsedata);
 				}
-				socket.getOutputStream().write(responsedata);
+				os.write(responsedata);
 			}
 		}
 
@@ -176,7 +180,7 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 	}
 
 	// 读第一个时判断read值是否为-1，如果为-1则表示客户下线需要做下线处理
-	private void readFirst(InputStream is, Field field, JSONObject newjson) throws IOException, DtuMessageException
+	private void readFirst(C2DataInput is, Field field, JSONObject newjson) throws IOException, DtuMessageException
 	{
 		byte[] recvHead = new byte[field.getType().BYTES];
 		int rlRead = is.read(recvHead, 0, field.getType().BYTES);
@@ -196,12 +200,12 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 	}
 
 	// 此方法需要抽象出去，影响读取方式
-	private void readDebug(InputStream is, Field field, JSONObject newjson) throws IOException
+	private void readDebug(C2DataInput is, Field field, JSONObject newjson) throws IOException
 	{
 		analysisFieldService.read(is, field, newjson);
 	}
 
-	private void read(InputStream is, Field field, JSONObject newjson) throws IOException
+	private void read(C2DataInput is, Field field, JSONObject newjson) throws IOException
 	{
 		if (SystemConsts.isDebug) {
 			readDebug(is, field, newjson);
@@ -211,7 +215,7 @@ public class DefaultReadMessageServerImpl implements ReadMessageServer
 
 	}
 
-	private void read(InputStream is, Field field, JSONObject newjson, CheckField check) throws IOException
+	private void read(C2DataInput is, Field field, JSONObject newjson, CheckField check) throws IOException
 	{
 		if (SystemConsts.isDebug) {
 			readDebug(is, field, newjson);

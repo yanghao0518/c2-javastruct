@@ -1,8 +1,11 @@
 package com.sgck.dtu.analysis.writer;
 
+import java.io.IOException;
+
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.Message;
 import com.sgck.dtu.analysis.common.TemplateMessage;
+import com.sgck.dtu.analysis.exception.DtuMessageException;
 import com.sgck.dtu.analysis.manager.TemplateMessageManager;
 import com.sgck.dtu.analysis.utiils.CheckUtils;
 
@@ -31,7 +34,7 @@ public class DefaultResponseMessageServiceImpl implements ResponseMessageService
 		this.writeMessageService = writeMessageService;
 	}
 	@Override
-	public byte[] resolve(String protocolid, JSONObject content) {
+	public byte[] resolve(String protocolid, JSONObject content) throws DtuMessageException, IOException{
 		// 获取返回消息模板
 				Message contentTemplat = TemplateMessageManager.getInstance().getTCMessage(protocolid);
 				CheckUtils.checkNull(contentTemplat, "the protocol not defined and protocolid is " + protocolid);

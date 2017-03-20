@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.alibaba.fastjson.JSONObject;
 import com.sgck.dtu.analysis.common.Field;
 import com.sgck.dtu.analysis.common.LEDataOutputStream;
@@ -15,6 +17,8 @@ import com.sgck.dtu.analysis.utiils.CheckUtils;
 
 public class SendMessageNewServiceImpl implements SendMessageNewService
 {
+	Logger LOG = Logger.getLogger(this.getClass());
+	
 	private CheckRuleService checkRuleService = new CheckRuleServiceImpl();
 
 	public CheckRuleService getCheckRuleService()
@@ -41,7 +45,7 @@ public class SendMessageNewServiceImpl implements SendMessageNewService
 		
 		//dos.flush();
 		
-		System.out.println("发出的数据:"+dos.getOrgList());
+		LOG.info("发出的数据:"+dos.getOrgList());
 		
 		return dos.getOrgList();
 
