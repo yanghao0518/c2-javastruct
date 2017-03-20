@@ -3,20 +3,20 @@
 <!-- 以下每个协议都有包头和包尾在解析的时候，会自动加上 -->
 <!-- 包头，通过包头指定的 primaryKey解析每次通信所属协议,也称作每次通信的公共部分-->
 <head primaryKey="Package_Type">
-<Constant_Up type="ushort" default="0x5555"/><!--  2字节，前导字符，固定为0X5555，表示为上行数据包-->
+<Constant_Up type="ushort" default="21845"/><!--  2字节，前导字符，固定为0X5555，表示为上行数据包-->
 <Gateway_Id type="unsigendint"/><!-- 4字节，网关id号 -->
 </head>
 
 <!-- 包尾可以没有 -->
 <foot>
 <BCC type="char"/><!-- 1个字节，前面所有数据含前导，异或运算 -->
-<Constant_Up_Stop type="ushort" default="0x55AA"/><!-- 2字节，固定为0X55AA，表示为上行数据包结束 -->
+<Constant_Up_Stop type="ushort" default="21930"/><!-- 2字节，固定为0X55AA，表示为上行数据包结束 -->
 </foot>
 
 <!-- 通讯确认-->
 <Server_Gateway name="ACK" id="1">
-<Package_Type type="char" default="0x01"/><!-- 1字节，协议号=0x01 -->
-<Package_length type="ushort" default="0x06"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
+<Package_Type type="char" default="1"/><!-- 1字节，协议号=0x01 -->
+<Package_length type="ushort" default="6"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
 <Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
 <command_properties type="char"/><!-- 1字节，
 =0x01,表示传感节点测试通信
@@ -156,6 +156,6 @@ Bit6	速度z波形	N	Y
 <Speed_Z_alarm_Change type="ushort" default="50"/><!--速度z方向变化量报警值，和上一次Change报警比较%不做  /默认0.5-->
 <Speed_Z_alarm_L type="ushort" default="0"/><!--速度z方向低报警值，乘以该值/100得到真实值%暂不做  /默认0-->
 <Speed_Z_alarm_LL type="ushort" default="0"/><!--速度z方向低低报警值，%暂不做  /默认0-->
-
+<Constant_Up_Stop1 type="ushort" default="21930"/><!-- 固定为0X55AA，表示为下行数据包结束 -->
 </Server_Gateway>
 </Server_Gateways>

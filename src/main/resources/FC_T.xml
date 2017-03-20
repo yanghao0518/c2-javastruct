@@ -2,7 +2,11 @@
 
 <Gateway_Servers>
 <!-- 实现解析类的基本路径 -->
+<!--  
 <base_package src="com.sgck.dtu.analysis.read.handle"/>
+-->
+<base_package src="com.sg2k.read.handle"/>
+
 <!-- 以下每个协议都有包头和包尾在解析的时候，会自动加上 -->
 <!-- 包头，通过包头指定的 primaryKey解析每次通信所属协议,也称作每次通信的公共部分-->
 <head primaryKey="Package_Type">
@@ -18,14 +22,12 @@
 </foot>
 
 <!-- 包检测机制 -->
-<!-- 检测长度 -->
-<check type="length">
-<start isContain="true">Package_length</start>
-<end isContain="true">BBC</end>
+<check type="field" id="BCC">
+<BCC targetField="BCC"/>
 </check>
 
 <!-- 通讯确认 协议号=0x01-->
-<Gateway_Server name="ACK" id="1" check="length">
+<Gateway_Server name="ACK" id="1">
 <Version type="char"/><!-- 1字节,网关软件版本 -->
 <Package_length type="ushort"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
 <Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
@@ -77,6 +79,38 @@
 <Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
 <command_properties type="char"/><!-- 1字节，=0x01,表示传感器霍尔触发上传数据=0x02，表示传感器定时上传数据-->
 <Recver_Riss type="char" /><!-- 接收到这包数据的场强 -->
+</Gateway_Server>
+
+<!-- 波形前导数据 -->
+<Gateway_Server name="Sensor" id="4-4" secondPrimaryKey="command_properties">
+<Sensor_Id type="unsigendint"/><!-- 4字节，传感器ID -->
+<Version type="char"/><!-- 1字节,网关软件版本 -->
+<Package_length type="ushort"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
+<Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
+<command_properties type="char"/><!-- 1字节，命令属性为0X04，表示传感节点申请波形上传-->
+<Wave_attribute type="char"/><!-- 1字节，当前数据属性-->
+<Wave_long type="char"/><!-- 1字节，波形长度=0  512点  =1  1024点 =2 	2048点	=3	4096点 =4	8192点 -->
+<Temperature type="short"/><!-- 2字节，温度值,真实值等于该值*0.01 -->
+<Sample_Frequency type="ushort"/><!-- 2字节，采样频率 -->
+<Wave_coefficient type="ushort"/><!-- 系数，后续发送值*系数/100得到真实值 -->
+</Gateway_Server>
+<!-- 波形后导数据 -->
+<Gateway_Server name="Sensor" id="4-5" secondPrimaryKey="command_properties">
+<Sensor_Id type="unsigendint"/><!-- 4字节，传感器ID -->
+<Version type="char"/><!-- 1字节,网关软件版本 -->
+<Package_length type="ushort"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
+<Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
+<command_properties type="char"/><!-- 1字节，命令属性为0X04，表示传感节点申请波形上传-->
+<Wave_data type="ushotarray"/><!-- 1024个数据，每包1024个数据，最后一包按实际剩余数据量 -->
+</Gateway_Server>
+<!-- 波形结束包数据 -->
+<Gateway_Server name="Sensor" id="4-6" secondPrimaryKey="command_properties">
+<Sensor_Id type="unsigendint"/><!-- 4字节，传感器ID -->
+<Version type="char"/><!-- 1字节,网关软件版本 -->
+<Package_length type="ushort"/><!--2字节数据包长度，单位字节，从Package_length（包含）至BCC（包含） -->
+<Package_Number type="ushort"/><!-- 2字节，包序号，copy接收到的上行数据包包序号 -->
+<command_properties type="char"/><!-- 1字节，命令属性为0X04，表示传感节点申请波形上传-->
+<Wave_data type="ushotarray"/><!-- 1024个数据，每包1024个数据，最后一包按实际剩余数据量 -->
 </Gateway_Server>
 
 </Gateway_Servers>
