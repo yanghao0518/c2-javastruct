@@ -74,6 +74,32 @@ public class WriteOutBigger implements WriteOut
 	{
 		writeInt(list, Float.floatToIntBits(v));
 	}
+	
+	public void writeShort(byte[] list, int start, short v) throws IOException
+	{
+		writeShort(list, start, v);
+	}
+	
+	
+	public void writeFloat(byte[] list, int start, float v) throws IOException
+	{
+		writeInt(list, start, Float.floatToIntBits(v));
+	}
+	
+	public void writeShort(byte[] list, int start, int v) throws IOException
+	{
+		list[start] = (byte)((v >>> 8) & 0xFF);
+		list[start + 1] = (byte)((v >>> 0) & 0xFF);
+	}
+	
+	public void writeInt(byte[] list, int start, int v) throws IOException
+	{
+		list[start] = (byte)((v >>> 24) & 0xFF);
+		list[start + 1] = (byte)((v >>> 16) & 0xFF);
+		list[start + 2] = (byte)((v >>> 8) & 0xFF);
+		list[start + 3] = (byte)((v >>> 0) & 0xFF);
+
+	}
 
 	/**
 	 * like DataOutputStream.writeDouble.

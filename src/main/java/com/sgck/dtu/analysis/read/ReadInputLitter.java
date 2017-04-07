@@ -186,4 +186,11 @@ public class ReadInputLitter implements ReadInput
 		return unsignedLong;
 	}
 
+	@Override
+	public void readUShortArray(InputStream in, int[] datas, List<Byte> list, List<Number> wavePackage) throws DtuMessageException, IOException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -17,4 +17,7 @@ public final class SystemConsts
 	public static ByteOrder order = ByteOrder.BIG_ENDIAN;
 	
 	public static boolean isTest = false;
+	
+	//默认每包波形长度
+	public static int transfer_wave_long = 1024;
 }

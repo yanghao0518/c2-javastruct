@@ -46,7 +46,7 @@ public class WaveCache
 
 	private String getKey(int t1, int t2)
 	{
-		return t1 + "_" + t1;
+		return t1 + "_" + t2;
 	}
 
 	public void dealRealData(WaveReadConfig readConfig)
@@ -82,10 +82,10 @@ public class WaveCache
 		if (last1.equals("00")) {
 			// X
 			type2 = 0;
-		} else if (last.equals("01")) {
+		} else if (last1.equals("01")) {
 			// Y
 			type2 = 1;
-		} else if (last.equals("10")) {
+		} else if (last1.equals("10")) {
 			// Z
 			type2 = 2;
 		}

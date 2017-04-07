@@ -40,6 +40,9 @@ public interface ReadInput
 
 	public void readUShortArray(InputStream in, int[] datas, List<Byte> list) throws DtuMessageException, IOException;;
 
+	public void readUShortArray(InputStream in, int[] datas, List<Byte> list,List<Number> wavePackage) throws DtuMessageException, IOException;;
+
+	
 	public String readUTF(InputStream in, int len, List<Byte> list) throws DtuMessageException, IOException;;
 
 	public String readUTF(InputStream in, int len, List<Byte> list, String encoding)throws DtuMessageException, IOException;;

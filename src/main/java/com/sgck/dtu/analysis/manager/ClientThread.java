@@ -52,11 +52,11 @@ public class ClientThread extends Thread
 		this.socket = socket;
 		this.readMessageServer = readMessageServer;
 		//this.callback = callback;
-		try {
-			lis = new LEDataInputStream(this.socket.getInputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			lis = new LEDataInputStream(this.socket.getInputStream());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		// 打印连接成功信息
 		LOG.info(getPrintInfo() + "与服务器连接成功!");
 	}
@@ -65,6 +65,7 @@ public class ClientThread extends Thread
 	{// 不断接收客户端的消息，进行处理。
 		while (!iscolse) {
 			try {
+				//方案修改，每次预读1024个字节，进行解析，
 				readMessageServer.read(this.socket.getInputStream(), this.socket.getOutputStream());
 			} catch (SocketException e) {
 				// 断开连接释放资源

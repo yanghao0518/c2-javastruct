@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -216,18 +217,23 @@ public class ReadFieldServiceImpl implements ReadFieldService
 			break;
 		case USHORTARRAY:
 			// 注意此次可能是波形，暂时写死判断在此处
-			int currentPackageNum = newjson.getIntValue("Package_ Number");
-			int defaultArrayLength = WaveReadConfig.transferNumber;
+			int currentPackageNum = newjson.getIntValue("Package_Number");
+			int defaultArrayLength = SystemConsts.transfer_wave_long;
 			WaveReadConfig config = WaveCache.getInstance().getCurrentWaveReadConfig(currentPackageNum - 1);
 
 			if (null != config) {
 				// 剩余量小于1024个点
-				if (config.getResidue() > 0 && config.getResidue() < WaveReadConfig.transferNumber) {
+				if (config.getResidue() > 0 && config.getResidue() < SystemConsts.transfer_wave_long) {
 					defaultArrayLength = config.getResidue();
 				}
 			}
 			int[] datas = new int[defaultArrayLength];
-			readInput.readUShortArray(in, datas, list);
+			List<Number> wavePackage = (List<Number>)newjson.get("wavePackage");
+			if(null == wavePackage){
+				wavePackage = new ArrayList();
+				newjson.put("wavePackage", wavePackage);
+			}
+			readInput.readUShortArray(in, datas, list,wavePackage);
 			newjson.put(field.getName(), datas);
 			return;
 		default:

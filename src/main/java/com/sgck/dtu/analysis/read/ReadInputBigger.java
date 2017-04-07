@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.sgck.dtu.analysis.exception.DtuMessageException;
 
 /**
@@ -15,6 +17,8 @@ import com.sgck.dtu.analysis.exception.DtuMessageException;
 public class ReadInputBigger implements ReadInput
 {
 
+	private Logger LOG = Logger.getLogger(this.getClass());
+	
 	public final void readFully(InputStream in, byte b[], int off, int len) throws IOException, DtuMessageException
 	{
 		if (len < 0)
@@ -37,6 +41,18 @@ public class ReadInputBigger implements ReadInput
 			i++;
 		}
 	}
+	
+	public final void readToList(byte[] w, List<Byte> list,List<Number> packages)
+	{
+		int size = w.length;
+		int i = 0;
+		while (i < size) {
+			list.add((byte)(w[i]& 0xff));
+			packages.add((byte)(w[i]& 0xff));
+			i++;
+		}
+	}
+
 
 	public final short readShort(InputStream in, List<Byte> list) throws IOException, DtuMessageException
 	{
@@ -52,6 +68,14 @@ public class ReadInputBigger implements ReadInput
 		byte[] w = new byte[2];
 		readFully(in, w, 0, 2);
 		readToList(w, list);
+		return ((w[0] & 0xff) << 8 | (w[1] & 0xff));
+	}
+	
+	public final int readUnsignedShort(InputStream in, List<Byte> list,List<Number> wavePackges) throws IOException
+	{
+		byte[] w = new byte[2];
+		readFully(in, w, 0, 2);
+		readToList(w, list,wavePackges);
 		return ((w[0] & 0xff) << 8 | (w[1] & 0xff));
 	}
 
@@ -156,10 +180,41 @@ public class ReadInputBigger implements ReadInput
 	{
 
 		int size = datas.length;
+		//预读1024个点
+		//byte[] bytes = new byte[size];
+		//in.read(bytes);
+		//解析bytes
 		for (int i = 0; i < size; i++) {
 			datas[i] = readUnsignedShort(in, list);
 		}
+		LOG.info("读取波形成功!");
 	}
+	
+	public final void readUShortArrayBak(InputStream in, int[] datas, List<Byte> list) throws IOException
+	{
+
+		int size = datas.length;
+		//预读1024个点
+		byte[] bytes = new byte[size*2];
+		in.read(bytes);
+		//解析bytes
+		for (int i = 0; i < size; i++) {
+			byte[] tmp = new byte[2];
+			tmp[0] = bytes[i];
+			tmp[1] = bytes[i+1];
+			datas[i] = readUnsignedShort(tmp,list);
+		}
+		LOG.info("读取波形成功!");
+	}
+	
+	
+	
+	public final int readUnsignedShort(byte[] w, List<Byte> list) throws IOException
+	{
+		readToList(w, list);
+		return ((w[0] & 0xff) << 8 | (w[1] & 0xff));
+	}
+	
 
 	public final String readUTF(InputStream in, int len, List<Byte> list) throws IOException
 	{
@@ -185,6 +240,20 @@ public class ReadInputBigger implements ReadInput
 		int fourthByte = (0x000000FF & ((int) buf[index + 3]));
 		long unsignedLong = ((long) (firstByte << 24 | secondByte << 16 | thirdByte << 8 | fourthByte)) & 0xFFFFFFFFL;
 		return unsignedLong;
+	}
+
+	@Override
+	public void readUShortArray(InputStream in, int[] datas, List<Byte> list, List<Number> wavePackage) throws DtuMessageException, IOException
+	{
+		int size = datas.length;
+		//预读1024个点
+		//byte[] bytes = new byte[size];
+		//in.read(bytes);
+		//解析bytes
+		for (int i = 0; i < size; i++) {
+			datas[i] = readUnsignedShort(in, list, wavePackage);
+		}
+		LOG.info("读取波形成功!");
 	}
 
 }

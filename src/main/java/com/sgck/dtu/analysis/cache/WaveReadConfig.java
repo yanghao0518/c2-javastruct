@@ -5,7 +5,8 @@ import java.util.List;
 
 public class WaveReadConfig
 {
-	public final static int transferNumber = 1024;
+	//public final static int transferNumber = 1024;
+	//public final static int transferNumber = 512;
 	private int Package_Number;
 	private byte command_properties;
 	private int Gateway_Id;
@@ -18,6 +19,11 @@ public class WaveReadConfig
 	private int residue;// 当前剩余多少点
 	private List<Integer> datas = new ArrayList<>();
 	private List<Number> realDatas = new ArrayList<>();
+	private List<Number> wavePackage = new ArrayList<>();
+	
+	public void addWavePackage(List<Number> packages){
+		wavePackage.addAll(packages);
+	}
 
 	public void addData(int[] data)
 	{
